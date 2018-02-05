@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"panda/models"
 	"panda/types"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -92,6 +93,13 @@ func (c *UserLoginController) RegistUser() {
 	if err = c.ValidatePassWord(reqRgt.Password); err != nil {
 		goto errDeal
 	}
+
+	if !VCodeValidate(reqRgt.VerifyId, reqRgt.VerifyCode) {
+		err = types.Error_VerifyCode_Wrong
+		goto errDeal
+	}
+
+	fmt.Println("verifycode ok!!!!")
 
 	mUser = &models.Player{
 		Nickname:   reqRgt.NickName,
@@ -210,7 +218,11 @@ errDeal:
 
 func (c *UserLoginController) ValidateUserName(userName string) (err error) {
 	if len(userName) < 2 {
-		err = errors.New("length not enough")
+		err = errors.New("username length not enough")
+		return err
+	}
+	if !strings.Contains(userName, "@") {
+		err = errors.New("username format not right")
 		return err
 	}
 	return nil
@@ -218,7 +230,7 @@ func (c *UserLoginController) ValidateUserName(userName string) (err error) {
 
 func (c *UserLoginController) ValidatePassWord(passWord string) (err error) {
 	if len(passWord) < 6 {
-		err = errors.New("length not enough")
+		err = errors.New("password length not enough")
 		return err
 	}
 	return nil

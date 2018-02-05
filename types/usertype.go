@@ -1,11 +1,19 @@
 package types
 
+import (
+	"errors"
+)
+
 var (
 	USER_EXIST     = "user already exist"
 	USER_REGIST_OK = "user regist success"
 
 	USER_LOGIN_SUCCESS = "user login success"
 	USER_LOGIN_FAILED  = "user login failed"
+)
+
+var (
+	Error_VerifyCode_Wrong = errors.New("verify code is wrong")
 )
 
 type ReqVerifyCode struct {
@@ -26,6 +34,7 @@ type RspVerifyCode struct {
 type ReqRegist struct {
 	UserName   string `json:"userName"`
 	Password   string `json:"passWord"`
+	VerifyId   string `json:"verifyId"`
 	VerifyCode string `json:"verifyCode"`
 	NickName   string `json:"nickName"`
 	TimeStamp  string `json:"timeStamp"`
