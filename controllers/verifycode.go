@@ -29,6 +29,39 @@ func (c *VerifyController) GenerateCode() {
 	return
 }
 
+func (c *VerifyController) ValidateCode() {
+
+	var (
+		rspVerify types.RspVerify
+		err       error
+	)
+
+	codeId := c.GetString("codeId")
+	value := c.GetString("verifyValue")
+
+	if len(codeId) == 0 || len(value) == 0 {
+		err = types.Error_Params_Empty
+		goto errDeal
+	}
+
+	if !VCodeValidate(codeId, value) {
+		rspVerify = types.RspVerify{
+			Success: false,
+			Message: types.VERIFY_VALID_FAILED,
+		}
+	} else {
+		rspVerify = types.RspVerify{
+			Success: true,
+			Message: types.VERIFY_VALID_SUCCESS,
+		}
+	}
+	c.Ctx.Output.JSON(rspVerify, false, false)
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
 func VCodeGenerate(heigt, width, mode int) (capId, pngBase64 string) {
 
 	configChar := cap.ConfigCharacter{

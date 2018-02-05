@@ -10,10 +10,14 @@ var (
 
 	USER_LOGIN_SUCCESS = "user login success"
 	USER_LOGIN_FAILED  = "user login failed"
+
+	VERIFY_VALID_FAILED  = "verify failed"
+	VERIFY_VALID_SUCCESS = "verify success"
 )
 
 var (
 	Error_VerifyCode_Wrong = errors.New("verify code is wrong")
+	Error_Params_Empty     = errors.New("params is empty")
 )
 
 type ReqVerifyCode struct {
@@ -34,7 +38,6 @@ type RspVerifyCode struct {
 type ReqRegist struct {
 	UserName   string `json:"userName"`
 	Password   string `json:"passWord"`
-	VerifyId   string `json:"verifyId"`
 	VerifyCode string `json:"verifyCode"`
 	NickName   string `json:"nickName"`
 	TimeStamp  string `json:"timeStamp"`

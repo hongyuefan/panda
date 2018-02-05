@@ -19,6 +19,7 @@ func init() {
 	beego.Router("/v1/tsxm/regist", &controllers.UserLoginController{}, "post:RegistUser")
 	beego.Router("/v1/tsxm/login", &controllers.UserLoginController{}, "post:UserLogin")
 	beego.Router("/v1/tsxm/genverifycode", &controllers.VerifyController{}, "get:GenerateCode")
+	beego.Router("/v1/tsxm/validateCode", &controllers.VerifyController{}, "get:ValidateCode")
 
 	ns := beego.NewNamespace("/v1",
 

@@ -6,6 +6,11 @@ type RspGenCode struct {
 }
 
 type ReqVerify struct {
-	CodeId      string
-	VerifyValue string
+	CodeId      string `json:"codeId"`
+	VerifyValue string `json:"verifyValue"`
+}
+
+type RspVerify struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
 }

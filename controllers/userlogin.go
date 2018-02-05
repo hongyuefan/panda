@@ -94,13 +94,6 @@ func (c *UserLoginController) RegistUser() {
 		goto errDeal
 	}
 
-	if !VCodeValidate(reqRgt.VerifyId, reqRgt.VerifyCode) {
-		err = types.Error_VerifyCode_Wrong
-		goto errDeal
-	}
-
-	fmt.Println("verifycode ok!!!!")
-
 	mUser = &models.Player{
 		Nickname:   reqRgt.NickName,
 		Email:      reqRgt.UserName,
