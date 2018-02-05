@@ -1,0 +1,97 @@
+// @APIVersion 1.0.0
+// @Title beego Test API
+// @Description beego has a very cool tools to autogenerate documents for your API
+// @Contact astaxie@gmail.com
+// @TermsOfServiceUrl http://beego.me/
+// @License Apache 2.0
+// @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
+package routers
+
+import (
+	"panda/controllers"
+
+	"github.com/astaxie/beego"
+)
+
+func init() {
+
+	beego.Router("/v1/verifycode", &controllers.UserLoginController{}, "post:VerifyUser")
+	beego.Router("/v1/regist", &controllers.UserLoginController{}, "post:RegistUser")
+	beego.Router("/v1/login", &controllers.UserLoginController{}, "post:UserLogin")
+
+	ns := beego.NewNamespace("/v1",
+
+		beego.NSNamespace("/income",
+			beego.NSInclude(
+				&controllers.IncomeController{},
+			),
+		),
+
+		beego.NSNamespace("/attribute",
+			beego.NSInclude(
+				&controllers.AttributeController{},
+			),
+		),
+
+		beego.NSNamespace("/order",
+			beego.NSInclude(
+				&controllers.OrderController{},
+			),
+		),
+
+		beego.NSNamespace("/pet",
+			beego.NSInclude(
+				&controllers.PetController{},
+			),
+		),
+
+		beego.NSNamespace("/trade",
+			beego.NSInclude(
+				&controllers.TradeController{},
+			),
+		),
+
+		beego.NSNamespace("/incometype",
+			beego.NSInclude(
+				&controllers.IncometypeController{},
+			),
+		),
+
+		beego.NSNamespace("/catch",
+			beego.NSInclude(
+				&controllers.CatchController{},
+			),
+		),
+
+		beego.NSNamespace("/feedeffect",
+			beego.NSInclude(
+				&controllers.FeedeffectController{},
+			),
+		),
+
+		beego.NSNamespace("/ordereffect",
+			beego.NSInclude(
+				&controllers.OrdereffectController{},
+			),
+		),
+
+		beego.NSNamespace("/player",
+			beego.NSInclude(
+				&controllers.PlayerController{},
+			),
+		),
+
+		beego.NSNamespace("/transaccount",
+			beego.NSInclude(
+				&controllers.TransaccountController{},
+			),
+		),
+
+		beego.NSNamespace("/attrvalue",
+			beego.NSInclude(
+				&controllers.AttrvalueController{},
+			),
+		),
+	)
+	beego.AddNamespace(ns)
+}
