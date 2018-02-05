@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"panda/models"
 	"panda/types"
@@ -82,6 +83,13 @@ func (c *UserLoginController) RegistUser() {
 		err    error
 	)
 	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
+		goto errDeal
+	}
+
+	if err = c.ValidateUserName(reqRgt.UserName); err != nil {
+		goto errDeal
+	}
+	if err = c.ValidatePassWord(reqRgt.Password); err != nil {
 		goto errDeal
 	}
 
@@ -198,4 +206,20 @@ func (c *UserLoginController) UserLogin() {
 errDeal:
 	ErrorHandler(c.Ctx, err)
 	return
+}
+
+func (c *UserLoginController) ValidateUserName(userName string) (err error) {
+	if len(userName) < 2 {
+		err = errors.New("length not enough")
+		return err
+	}
+	return nil
+}
+
+func (c *UserLoginController) ValidatePassWord(passWord string) (err error) {
+	if len(passWord) < 6 {
+		err = errors.New("length not enough")
+		return err
+	}
+	return nil
 }

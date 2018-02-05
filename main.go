@@ -17,5 +17,5 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	beego.Run("127.0.0.1:8080")
+	beego.Run(":8080")
 }
