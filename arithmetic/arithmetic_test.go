@@ -20,3 +20,10 @@ func TestTrain(t *testing.T) {
 	t.Log(OverturnArray(b))
 	return
 }
+
+func TestGetRandLimit(t *testing.T) {
+
+	t.Log(GetRandLimit(4))
+
+	return
+}

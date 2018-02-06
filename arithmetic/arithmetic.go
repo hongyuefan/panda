@@ -3,6 +3,7 @@ package arithmetic
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -10,7 +11,7 @@ import (
 
 //获取（min，max）之间大小的随机数
 func GetRand(min float64, max float64) (result float64) {
-	source := rand.NewSource(time.Now().Unix())
+	source := rand.NewSource(time.Now().UnixNano())
 	nRand := rand.New(source)
 	return nRand.Float64()*(max-min) + min
 }
@@ -44,6 +45,17 @@ func OverturnArray(arry []byte) (arry_result []byte) {
 
 	for i, b := range arry {
 		arry_result[nLen-i-1] = b
+	}
+	return
+}
+
+func GetRandLimit(count int) (result string) {
+
+	for i := 0; i < count; i++ {
+
+		rand := GetRand(0.0, 9.0)
+
+		result += fmt.Sprintf("%v", int(rand))
 	}
 	return
 }

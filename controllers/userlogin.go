@@ -87,10 +87,10 @@ func (c *UserLoginController) RegistUser() {
 		goto errDeal
 	}
 
-	if err = c.ValidateUserName(reqRgt.UserName); err != nil {
+	if err = ValidateUserName(reqRgt.UserName); err != nil {
 		goto errDeal
 	}
-	if err = c.ValidatePassWord(reqRgt.Password); err != nil {
+	if err = ValidatePassWord(reqRgt.Password); err != nil {
 		goto errDeal
 	}
 
@@ -209,7 +209,7 @@ errDeal:
 	return
 }
 
-func (c *UserLoginController) ValidateUserName(userName string) (err error) {
+func ValidateUserName(userName string) (err error) {
 	if len(userName) < 2 {
 		err = errors.New("username length not enough")
 		return err
@@ -221,7 +221,7 @@ func (c *UserLoginController) ValidateUserName(userName string) (err error) {
 	return nil
 }
 
-func (c *UserLoginController) ValidatePassWord(passWord string) (err error) {
+func ValidatePassWord(passWord string) (err error) {
 	if len(passWord) < 6 {
 		err = errors.New("password length not enough")
 		return err
