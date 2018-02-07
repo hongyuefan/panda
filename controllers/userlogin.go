@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"panda/models"
@@ -34,18 +33,23 @@ func (c *UserLoginController) VerifyUser() {
 		err       error
 	)
 
-	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
-		ErrorHandler(c.Ctx, err)
-		return
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
 	}
+
+	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
+	//		goto errDeal
+	//	}
+
+	reqVerify.UserName = c.Ctx.Request.FormValue("userName")
+	reqVerify.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
 
 	mUser.Email = reqVerify.UserName
 
 	orm = models.NewCommon()
 
 	if err = orm.CommonGetOne(&mUser, "Email"); err != nil {
-		ErrorHandler(c.Ctx, err)
-		return
+		goto errDeal
 	}
 
 	if mUser.Id != 0 {
@@ -70,6 +74,9 @@ func (c *UserLoginController) VerifyUser() {
 	c.Ctx.Output.JSON(rspVerify, false, false)
 
 	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
 
 }
 
@@ -83,9 +90,19 @@ func (c *UserLoginController) RegistUser() {
 		uid    int64
 		err    error
 	)
-	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
+	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
+	//		goto errDeal
+	//	}
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
+
+	reqRgt.NickName = c.Ctx.Request.FormValue("nickName")
+	reqRgt.Password = c.Ctx.Request.FormValue("passWord")
+	reqRgt.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
+	reqRgt.UserName = c.Ctx.Request.FormValue("userName")
+	reqRgt.VerifyCode = c.Ctx.Request.FormValue("verifyCode")
 
 	if err = ValidateUserName(reqRgt.UserName); err != nil {
 		goto errDeal
@@ -159,9 +176,17 @@ func (c *UserLoginController) UserLogin() {
 		err      error
 	)
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
+	//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
+	//		goto errDeal
+	//	}
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
+
+	reqLogin.UserName = c.Ctx.Request.FormValue("userName")
+	reqLogin.PassWord = c.Ctx.Request.FormValue("passWord")
+
 	mUser = &models.Player{
 		Email:    reqLogin.UserName,
 		Password: reqLogin.PassWord,

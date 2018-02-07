@@ -28,7 +28,6 @@ func (c *EmailController) ValidateEmailCode() {
 	var (
 		rspEmail types.RspEmail
 	)
-
 	email := c.GetString("email")
 	email_code := c.GetString("code")
 
