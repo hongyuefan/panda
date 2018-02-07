@@ -98,6 +98,8 @@ func (c *UserLoginController) RegistUser() {
 		goto errDeal
 	}
 
+	c.DelSession(reqRgt.UserName)
+
 	mUser = &models.Player{
 		Nickname:   reqRgt.NickName,
 		Email:      reqRgt.UserName,
