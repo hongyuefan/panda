@@ -40,8 +40,6 @@ func (c *EmailController) ValidateEmailCode() {
 		Message: "validate code success",
 	}
 
-	c.DelSession(email)
-
 	c.Ctx.Output.JSON(rspEmail, false, false)
 	return
 
