@@ -53,9 +53,9 @@ func GetRandLimit(count int) (result string) {
 
 	for i := 0; i < count; i++ {
 
-		rand := GetRand(0.0, 9.0)
+		srand := rand.Intn(9)
 
-		result += fmt.Sprintf("%v", int(rand))
+		result += fmt.Sprintf("%v", int(srand))
 	}
 	return
 }

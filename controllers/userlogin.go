@@ -93,6 +93,10 @@ func (c *UserLoginController) RegistUser() {
 	if err = ValidatePassWord(reqRgt.Password); err != nil {
 		goto errDeal
 	}
+	if len(reqRgt.VerifyCode) != Email_Code_Len || !validEmailCode(reqRgt.UserName, getSessionString(c.GetSession(reqRgt.UserName))) {
+		err = errors.New("email verify code not right")
+		goto errDeal
+	}
 
 	mUser = &models.Player{
 		Nickname:   reqRgt.NickName,
