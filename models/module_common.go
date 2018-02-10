@@ -29,6 +29,10 @@ func (c *Common) CommonInsert(v interface{}) (id int64, err error) {
 	return
 }
 
+func (c *Common) CommonUpdate(v interface{}, col ...string) (int64, error) {
+	return c.o.Update(v, col...)
+}
+
 func (c *Common) BeginTx() error {
 	return c.o.Begin()
 }

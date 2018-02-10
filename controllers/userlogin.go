@@ -169,11 +169,46 @@ func (c *UserLoginController) ModifyNickName() {
 
 	var (
 		nickName string
+		userId   int64
+		mUser    models.Player
+		err      error
+		orm      *models.Common
 	)
+
+	type Result struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
 
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
+
+	nickName = c.Ctx.Request.FormValue("nickname")
+
+	if userId, err = TokenValidate(c.Ctx.Input.Header("token")); err != nil {
+		goto errDeal
+	}
+
+	orm = models.NewCommon()
+
+	mUser.Id = userId
+
+	if err = orm.CommonGetOne(&mUser, "id"); err != nil {
+		goto errDeal
+	}
+
+	mUser.Nickname = nickName
+
+	if _, err = orm.CommonUpdate(&mUser, "id"); err != nil {
+		goto errDeal
+	}
+
+	c.Ctx.Output.JSON(Result{
+		Success: true,
+		Message: "update nickname success",
+	}, false, false)
+
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
