@@ -22,6 +22,9 @@ func init() {
 	beego.Router("/v1/tsxm/validateCode", &controllers.VerifyController{}, "get:ValidateCode")
 	beego.Router("/v1/tsxm/sendemail", &controllers.EmailController{}, "get:SendEmailCode")
 	beego.Router("/v1/tsxm/validemail", &controllers.EmailController{}, "get:ValidateEmailCode")
+	beego.Router("/v1/tsxm/agreement", &controllers.AgreeContoller{}, "get:GetAgreement")
+	beego.Router("/v1/tsxm/balance", &controllers.BalanceConroller{}, "get:GetBalance")
+	beego.Router("/v1/tsxm/recharge", &controllers.QRCodeController{}, "get:GenCode")
 
 	ns := beego.NewNamespace("/v1",
 

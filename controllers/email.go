@@ -60,7 +60,7 @@ func (c *EmailController) SendEmailCode() {
 	)
 	email := c.GetString("email")
 
-	if err = ValidateUserName(email); err != nil {
+	if err = ValidateEmail(email); err != nil {
 		goto errDeal
 	}
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"panda/models"
 	"panda/types"
-	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -104,7 +103,7 @@ func (c *UserLoginController) RegistUser() {
 	reqRgt.UserName = c.Ctx.Request.FormValue("userName")
 	reqRgt.VerifyCode = c.Ctx.Request.FormValue("verifyCode")
 
-	if err = ValidateUserName(reqRgt.UserName); err != nil {
+	if err = ValidateEmail(reqRgt.UserName); err != nil {
 		goto errDeal
 	}
 	if err = ValidatePassWord(reqRgt.Password); err != nil {
@@ -160,6 +159,21 @@ func (c *UserLoginController) RegistUser() {
 		},
 	}
 	c.Ctx.Output.JSON(rspRgt, false, false)
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
+func (c *UserLoginController) ModifyNickName() {
+
+	var (
+		nickName string
+	)
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
@@ -237,24 +251,4 @@ func (c *UserLoginController) UserLogin() {
 errDeal:
 	ErrorHandler(c.Ctx, err)
 	return
-}
-
-func ValidateUserName(userName string) (err error) {
-	if len(userName) < 2 {
-		err = errors.New("username length not enough")
-		return err
-	}
-	if !strings.Contains(userName, "@") {
-		err = errors.New("username format not right")
-		return err
-	}
-	return nil
-}
-
-func ValidatePassWord(passWord string) (err error) {
-	if len(passWord) < 6 {
-		err = errors.New("password length not enough")
-		return err
-	}
-	return nil
 }

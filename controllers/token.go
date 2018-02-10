@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"panda/models"
 	"panda/types"
@@ -28,24 +29,24 @@ func TokenGenerate(userId int64) (token string, err error) {
 	return ojwt.SignedString([]byte(Secret_Key))
 }
 
-func TokenValidate(token string) (ok bool, userId int64, err error) {
+func TokenValidate(token string) (userId int64, err error) {
 
 	ojwt, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(Secret_Key), nil
 	})
 
 	if err != nil {
-		return false, 0, err
+		return 0, err
 	}
 
 	if claims, ok := ojwt.Claims.(*jwt.StandardClaims); ok && ojwt.Valid {
 
 		userId, _ = strconv.ParseInt(claims.Issuer, 10, 64)
 
-		return ok, userId, nil
+		return userId, nil
 	}
 
-	return false, 0, nil
+	return 0, errors.New("token valide failse,please login again")
 
 }
 
