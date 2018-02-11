@@ -33,9 +33,13 @@ func (q *QRCodeController) GenCode() {
 		prepng  string
 		userId  int64
 		mUser   *models.Player
+		token   string
 	)
 
-	if userId, err = TokenValidate(q.Ctx.Input.Header("token")); err != nil {
+	if token, err = ParseToken(q.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+	if userId, err = TokenValidate(token); err != nil {
 		goto errDeal
 	}
 

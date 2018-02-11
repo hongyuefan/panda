@@ -173,6 +173,7 @@ func (c *UserLoginController) ModifyNickName() {
 		mUser    models.Player
 		err      error
 		orm      *models.Common
+		token    string
 	)
 
 	type Result struct {
@@ -186,7 +187,10 @@ func (c *UserLoginController) ModifyNickName() {
 
 	nickName = c.Ctx.Request.FormValue("nickname")
 
-	if userId, err = TokenValidate(c.Ctx.Input.Header("token")); err != nil {
+	if token, err = ParseToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+	if userId, err = TokenValidate(token); err != nil {
 		goto errDeal
 	}
 

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"panda/models"
 
 	"github.com/astaxie/beego"
@@ -35,7 +34,6 @@ func (a *AgreeContoller) GetAgreement() {
 	if err != nil {
 		goto errDeal
 	}
-	fmt.Println(result)
 
 	for _, v := range result {
 		sub.Text = v.(models.Agree).Title

@@ -26,8 +26,11 @@ func (b *BalanceConroller) GetBalance() {
 		orm     *models.Common
 		mUser   models.Player
 	)
-	token = b.Ctx.Input.Header("token")
+	token = b.Ctx.Input.Header("Authorization")
 
+	if token, err = ParseToken(token); err != nil {
+		goto errDeal
+	}
 	if userId, err = TokenValidate(token); err != nil {
 		goto errDeal
 	}
