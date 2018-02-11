@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"panda/models"
 
 	"github.com/astaxie/beego"
@@ -28,16 +29,17 @@ func (a *AgreeContoller) GetAgreement() {
 		sub         SubContent
 	)
 
-	query := make(map[string]string, 0)
+	query := make(map[string]string)
 
-	result, err := models.GetAllAgree(query, []string{""}, []string{"id"}, []string{"asc"}, 0, 100)
+	result, err := models.GetAllAgree(query, []string{}, []string{"id"}, []string{"asc"}, 0, 100)
 	if err != nil {
 		goto errDeal
 	}
+	fmt.Println(result)
 
 	for _, v := range result {
-		sub.Text = v.(map[string]interface{})["title"].(string)
-		sub.Standard = v.(map[string]interface{})["content"].(string)
+		sub.Text = v.(models.Agree).Title
+		sub.Standard = v.(models.Agree).Content
 
 		subContents = append(subContents, sub)
 	}

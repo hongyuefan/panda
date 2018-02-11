@@ -200,7 +200,9 @@ func (c *UserLoginController) ModifyNickName() {
 
 	mUser.Nickname = nickName
 
-	if _, err = orm.CommonUpdate(&mUser, "id"); err != nil {
+	fmt.Println(mUser)
+
+	if _, err = orm.CommonUpdate(&mUser, "id", "nickname"); err != nil {
 		goto errDeal
 	}
 
@@ -275,7 +277,7 @@ func (c *UserLoginController) UserLogin() {
 		rspLogin = types.RspRegist{
 			RspBase: types.RspBase{
 				MemberIsExist: User_Not_Exist,
-				Success:       true,
+				Success:       false,
 				Message:       types.USER_LOGIN_FAILED,
 			},
 			Data: types.User{},
