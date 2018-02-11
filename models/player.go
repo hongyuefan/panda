@@ -24,6 +24,8 @@ type Player struct {
 	UserType   string `orm:"column(usertype);size(32);null"`
 	Avatar     string `orm:"column(avatar);size(256);null"`
 	Balance    string `orm:"column(balance);size(128);null"`
+	PubPublic  string `orm:"column(pub_pubkey);size(128);null"`
+	PubPrivkey string `orm:"column(pub_privkey);size(128);null"`
 }
 
 func (t *Player) TableName() string {

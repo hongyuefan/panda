@@ -18,6 +18,10 @@ func init() {
 	orm.RegisterModel(new(Agree))
 }
 
+func (t *Agree) TableName() string {
+	return "agree"
+}
+
 func GetAllAgree(query map[string]string, fields []string, sortby []string, order []string, offset int64, limit int64) (ml []interface{}, err error) {
 
 	o := orm.NewOrm()

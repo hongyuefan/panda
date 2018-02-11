@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	//	"io"
-	//	"panda/models"
+	"panda/models"
 
 	"image/png"
 
@@ -30,11 +30,21 @@ func (q *QRCodeController) GenCode() {
 		c       *bytes.Buffer
 		code    string
 		prepng  string
+		userId  int64
+		mUser   *models.Player
 	)
+
+	if userId, err = TokenValidate(q.Ctx.Input.Header("token")); err != nil {
+		goto errDeal
+	}
+
+	if mUser, err = models.GetPlayerById(userId); err != nil {
+		goto errDeal
+	}
 
 	prepng = "data:image/png;base64,"
 
-	if barcode, err = qr.Encode(PublicKey_Setting, qr.L, qr.Unicode); err != nil {
+	if barcode, err = qr.Encode(mUser.PubPublic, qr.L, qr.Unicode); err != nil {
 		goto errDeal
 	}
 	c = new(bytes.Buffer)
