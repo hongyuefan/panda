@@ -194,13 +194,11 @@ func (c *UserLoginController) ModifyNickName() {
 
 	mUser.Id = userId
 
-	if err = orm.CommonGetOne(&mUser, "id"); err != nil {
-		goto errDeal
-	}
+	//	if err = orm.CommonGetOne(&mUser, "id"); err != nil {
+	//		goto errDeal
+	//	}
 
 	mUser.Nickname = nickName
-
-	fmt.Println(mUser)
 
 	if _, err = orm.CommonUpdate(&mUser, "id", "nickname"); err != nil {
 		goto errDeal
