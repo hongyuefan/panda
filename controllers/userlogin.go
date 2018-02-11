@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"panda/models"
 	"panda/types"
-	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -34,22 +32,23 @@ func (c *UserLoginController) VerifyUser() {
 		err       error
 	)
 
-	c.Ctx.Request.ParseForm()
-
-	fmt.Println(string(c.Ctx.Input.RequestBody))
-
-	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
-		ErrorHandler(c.Ctx, err)
-		return
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
 	}
+
+	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
+	//		goto errDeal
+	//	}
+
+	reqVerify.UserName = c.Ctx.Request.FormValue("userName")
+	reqVerify.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
 
 	mUser.Email = reqVerify.UserName
 
 	orm = models.NewCommon()
 
 	if err = orm.CommonGetOne(&mUser, "Email"); err != nil {
-		ErrorHandler(c.Ctx, err)
-		return
+		goto errDeal
 	}
 
 	if mUser.Id != 0 {
@@ -74,6 +73,9 @@ func (c *UserLoginController) VerifyUser() {
 	c.Ctx.Output.JSON(rspVerify, false, false)
 
 	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
 
 }
 
@@ -87,11 +89,21 @@ func (c *UserLoginController) RegistUser() {
 		uid    int64
 		err    error
 	)
-	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
+	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
+	//		goto errDeal
+	//	}
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
 
-	if err = ValidateUserName(reqRgt.UserName); err != nil {
+	reqRgt.NickName = c.Ctx.Request.FormValue("nickName")
+	reqRgt.Password = c.Ctx.Request.FormValue("passWord")
+	reqRgt.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
+	reqRgt.UserName = c.Ctx.Request.FormValue("userName")
+	reqRgt.VerifyCode = c.Ctx.Request.FormValue("verifyCode")
+
+	if err = ValidateEmail(reqRgt.UserName); err != nil {
 		goto errDeal
 	}
 	if err = ValidatePassWord(reqRgt.Password); err != nil {
@@ -153,6 +165,56 @@ errDeal:
 	return
 }
 
+func (c *UserLoginController) ModifyNickName() {
+
+	var (
+		nickName string
+		userId   int64
+		mUser    models.Player
+		err      error
+		orm      *models.Common
+	)
+
+	type Result struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	nickName = c.Ctx.Request.FormValue("nickname")
+
+	if userId, err = TokenValidate(c.Ctx.Input.Header("token")); err != nil {
+		goto errDeal
+	}
+
+	orm = models.NewCommon()
+
+	mUser.Id = userId
+
+	if err = orm.CommonGetOne(&mUser, "id"); err != nil {
+		goto errDeal
+	}
+
+	mUser.Nickname = nickName
+
+	if _, err = orm.CommonUpdate(&mUser, "id"); err != nil {
+		goto errDeal
+	}
+
+	c.Ctx.Output.JSON(Result{
+		Success: true,
+		Message: "update nickname success",
+	}, false, false)
+
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
 func (c *UserLoginController) UserLogin() {
 	var (
 		reqLogin types.ReqLogin
@@ -163,9 +225,17 @@ func (c *UserLoginController) UserLogin() {
 		err      error
 	)
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
+	//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
+	//		goto errDeal
+	//	}
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
+
+	reqLogin.UserName = c.Ctx.Request.FormValue("userName")
+	reqLogin.PassWord = c.Ctx.Request.FormValue("passWord")
+
 	mUser = &models.Player{
 		Email:    reqLogin.UserName,
 		Password: reqLogin.PassWord,
@@ -216,24 +286,4 @@ func (c *UserLoginController) UserLogin() {
 errDeal:
 	ErrorHandler(c.Ctx, err)
 	return
-}
-
-func ValidateUserName(userName string) (err error) {
-	if len(userName) < 2 {
-		err = errors.New("username length not enough")
-		return err
-	}
-	if !strings.Contains(userName, "@") {
-		err = errors.New("username format not right")
-		return err
-	}
-	return nil
-}
-
-func ValidatePassWord(passWord string) (err error) {
-	if len(passWord) < 6 {
-		err = errors.New("password length not enough")
-		return err
-	}
-	return nil
 }

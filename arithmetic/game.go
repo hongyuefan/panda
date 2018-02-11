@@ -1,19 +1,28 @@
 package arithmetic
 
-//type Multi_Pair struct {
-//	MuLevel uint8
-//	MuValue float64
-//}
+import (
+	"time"
+)
 
-//func Train(tx string, amount float64, mulPs []Multi_Pair) (result float64, err error) {
+const (
+	Result_Multiple = 1.5
+	Result_Normal   = 1
+)
 
-//	arryTmp, _ := SplitTx(tx, len(mulPs))
+func Rule(TrimN int, hash string) (result float32, err error) {
 
-//	arryData := OverturnArray(arryTmp)
+	var b byte
 
-//	for _, v := range mulPs {
+	if b, err = SplitTx_Trim_N(hash, TrimN); err != nil {
+		return 0, err
+	}
 
-//		result = arryData[v.MuLevel]
-//	}
-//	return
-//}
+	return income(b), nil
+}
+
+func income(b byte) float32 {
+	if int(b) == int(time.Now().Weekday()) {
+		return Result_Multiple
+	}
+	return Result_Normal
+}

@@ -27,6 +27,17 @@ func SplitTx(tx string, n int) (arry []byte, err error) {
 	return
 }
 
+//获取tx倒数第n个数字
+func SplitTx_Trim_N(tx string, n int) (b byte, err error) {
+	hTx := strings.TrimPrefix(strings.ToLower(tx), "0x")
+	arry, err := hex.DecodeString(hTx)
+	if err != nil {
+		return
+	}
+	b = arry[len(arry)-n] % 0x0f
+	return
+}
+
 //b对m取模
 func GetMod(b byte, m byte) (byte, error) {
 	if m <= 0 {

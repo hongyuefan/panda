@@ -28,7 +28,6 @@ func (c *EmailController) ValidateEmailCode() {
 	var (
 		rspEmail types.RspEmail
 	)
-
 	email := c.GetString("email")
 	email_code := c.GetString("code")
 
@@ -61,7 +60,7 @@ func (c *EmailController) SendEmailCode() {
 	)
 	email := c.GetString("email")
 
-	if err = ValidateUserName(email); err != nil {
+	if err = ValidateEmail(email); err != nil {
 		goto errDeal
 	}
 
