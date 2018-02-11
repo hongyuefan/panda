@@ -204,7 +204,7 @@ func (c *UserLoginController) ModifyNickName() {
 
 	mUser.Nickname = nickName
 
-	if _, err = orm.CommonUpdate(&mUser, "id", "nickname"); err != nil {
+	if _, err = orm.CommonUpdateById(&mUser, "nickname"); err != nil {
 		goto errDeal
 	}
 
@@ -289,5 +289,63 @@ func (c *UserLoginController) UserLogin() {
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
+	return
+}
+
+func (c *UserLoginController) UpdatePassWord() {
+	type RspPass struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+	var (
+		err         error
+		newPassWord string
+		email       string
+		verifyCody  string
+		user        models.Player
+		com         *models.Common
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	email = c.Ctx.Request.FormValue("userName")
+	newPassWord = c.Ctx.Request.FormValue("newPassword")
+	verifyCody = c.Ctx.Request.FormValue("verifyCody")
+
+	if err = ValidatePassWord(newPassWord); err != nil {
+		goto errDeal
+	}
+
+	if !validEmailCode(verifyCody, getSessionString(c.GetSession(email))) {
+		err = errors.New("email validate code not right")
+		goto errDeal
+	}
+
+	user.Email = email
+
+	com = models.NewCommon()
+
+	if err = com.CommonGetOne(&user, "Email"); err != nil {
+		goto errDeal
+	}
+
+	user.Password = newPassWord
+
+	if _, err = com.CommonUpdateById(&user, "password"); err != nil {
+		goto errDeal
+	}
+
+	c.Ctx.Output.JSON(RspPass{
+		Success: true,
+		Message: "update password success",
+	}, false, false)
+
+	return
+errDeal:
+	c.Ctx.Output.JSON(RspPass{
+		Success: false,
+		Message: err.Error(),
+	}, false, false)
 	return
 }

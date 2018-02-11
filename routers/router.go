@@ -27,6 +27,7 @@ func init() {
 	beego.Router("/v1/tsxm/recharge", &controllers.QRCodeController{}, "get:GenCode")
 	beego.Router("/v1/tsxm/modifyname", &controllers.UserLoginController{}, "post:ModifyNickName")
 	beego.Router("/v1/tsxm/transaction", &controllers.TransQContoller{}, "get:GetTransQ")
+	beego.Router("/v1/tsxm/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWord")
 
 	ns := beego.NewNamespace("/v1",
 

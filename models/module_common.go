@@ -29,7 +29,7 @@ func (c *Common) CommonInsert(v interface{}) (id int64, err error) {
 	return
 }
 
-func (c *Common) CommonUpdate(v interface{}, col ...string) (int64, error) {
+func (c *Common) CommonUpdateById(v interface{}, col ...string) (int64, error) {
 	return c.o.Update(v, col...)
 }
 
