@@ -34,6 +34,10 @@ func (c *UserLoginController) VerifyUser() {
 		err       error
 	)
 
+	c.Ctx.Request.ParseForm()
+
+	fmt.Println(string(c.Ctx.Input.RequestBody))
+
 	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
 		ErrorHandler(c.Ctx, err)
 		return
