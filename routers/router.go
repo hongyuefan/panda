@@ -25,6 +25,7 @@ func init() {
 	beego.Router("/v1/tsxm/agreement", &controllers.AgreeContoller{}, "get:GetAgreement")
 	beego.Router("/v1/tsxm/balance", &controllers.BalanceConroller{}, "get:GetBalance")
 	beego.Router("/v1/tsxm/recharge", &controllers.QRCodeController{}, "get:GenCode")
+	beego.Router("/v1/tsxm/modifyname", &controllers.UserLoginController{}, "post:ModifyNickName")
 
 	ns := beego.NewNamespace("/v1",
 

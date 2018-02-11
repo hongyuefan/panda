@@ -30,7 +30,7 @@ func (a *AgreeContoller) GetAgreement() {
 
 	query := make(map[string]string, 0)
 
-	result, err := models.GetAllAgree(query, []string{"title", "content"}, []string{"id"}, []string{"asc"}, 0, 100)
+	result, err := models.GetAllAgree(query, []string{""}, []string{"id"}, []string{"asc"}, 0, 100)
 	if err != nil {
 		goto errDeal
 	}
