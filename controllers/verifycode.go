@@ -22,7 +22,7 @@ func (c *VerifyController) GenerateCode() {
 	var (
 		rspCode types.RspGenCode
 	)
-	rspCode.CodeId, rspCode.PngBase64 = VCodeGenerate(60, 240, Cap_NumChar_Mod)
+	rspCode.CodeId, rspCode.PngBase64 = VCodeGenerate(60, 240, Cap_Metic_Mod)
 
 	c.Ctx.Output.JSON(rspCode, false, false)
 
@@ -70,9 +70,9 @@ func VCodeGenerate(heigt, width, mode int) (capId, pngBase64 string) {
 		Mode:               mode,
 		ComplexOfNoiseText: cap.CaptchaComplexLower,
 		ComplexOfNoiseDot:  cap.CaptchaComplexLower,
-		IsUseSimpleFont:    true,
-		IsShowHollowLine:   false,
-		IsShowNoiseDot:     false,
+		IsUseSimpleFont:    false,
+		IsShowHollowLine:   true,
+		IsShowNoiseDot:     true,
 		IsShowNoiseText:    false,
 		IsShowSlimeLine:    false,
 		IsShowSineLine:     false,
@@ -94,12 +94,12 @@ func VCodeGenerateByCapId(heigt, width, mode int, capId string) (pngBase64 strin
 		Mode:               mode,
 		ComplexOfNoiseText: cap.CaptchaComplexLower,
 		ComplexOfNoiseDot:  cap.CaptchaComplexLower,
-		IsUseSimpleFont:    true,
+		IsUseSimpleFont:    false,
 		IsShowHollowLine:   true,
 		IsShowNoiseDot:     true,
 		IsShowNoiseText:    true,
-		IsShowSlimeLine:    false,
-		IsShowSineLine:     false,
+		IsShowSlimeLine:    true,
+		IsShowSineLine:     true,
 		CaptchaLen:         4,
 	}
 

@@ -6,7 +6,7 @@ import (
 
 func TestVCodeGenerate(t *testing.T) {
 
-	id, png := VCodeGenerate(60, 240, Cap_NumChar_Mod)
+	id, png := VCodeGenerate(60, 240, Cap_Metic_Mod)
 
 	t.Log(png)
 
