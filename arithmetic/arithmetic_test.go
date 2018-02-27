@@ -23,7 +23,7 @@ func TestTrain(t *testing.T) {
 
 func TestGetRandLimit(t *testing.T) {
 
-	t.Log(GetRandLimit(4))
+	t.Log(GetRandLimit(5))
 
 	return
 }

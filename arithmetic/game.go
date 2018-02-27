@@ -9,6 +9,7 @@ const (
 	Result_Normal   = 1
 )
 
+func CatchPanda(hash string)
 func Rule(TrimN int, hash string) (result float32, err error) {
 
 	var b byte

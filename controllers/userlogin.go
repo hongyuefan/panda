@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"panda/models"
+	t "panda/transaction"
 	"panda/types"
 	"time"
 
@@ -81,13 +82,14 @@ errDeal:
 
 func (c *UserLoginController) RegistUser() {
 	var (
-		reqRgt types.ReqRegist
-		rspRgt types.RspRegist
-		mUser  *models.Player
-		orm    *models.Common
-		token  string
-		uid    int64
-		err    error
+		reqRgt          types.ReqRegist
+		rspRgt          types.RspRegist
+		mUser           *models.Player
+		orm             *models.Common
+		public, privkey string
+		token           string
+		uid             int64
+		err             error
 	)
 	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
 	//		goto errDeal
@@ -115,11 +117,17 @@ func (c *UserLoginController) RegistUser() {
 		goto errDeal
 	}
 
+	if public, privkey, err = t.Genkey(); err != nil {
+		goto errDeal
+	}
+
 	mUser = &models.Player{
 		Nickname:   reqRgt.NickName,
 		Email:      reqRgt.UserName,
 		Password:   reqRgt.Password,
 		Createtime: time.Now().Unix(),
+		PubPublic:  public,
+		PubPrivkey: privkey,
 	}
 	orm = models.NewCommon()
 

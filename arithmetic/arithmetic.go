@@ -38,6 +38,17 @@ func SplitTx_Trim_N(tx string, n int) (b byte, err error) {
 	return
 }
 
+//获取第n个数字
+func SplitTx_N(value string, n int) (b byte, err error) {
+	hTx := strings.TrimPrefix(strings.ToLower(tx), "0x")
+	arry, err := hex.DecodeString(hTx)
+	if err != nil {
+		return
+	}
+	b = arry[len(arry)-n] % 0x0f
+	return
+}
+
 //b对m取模
 func GetMod(b byte, m byte) (byte, error) {
 	if m <= 0 {
@@ -60,6 +71,7 @@ func OverturnArray(arry []byte) (arry_result []byte) {
 	return
 }
 
+//获取位数为count的随机数据字符串
 func GetRandLimit(count int) (result string) {
 
 	for i := 0; i < count; i++ {

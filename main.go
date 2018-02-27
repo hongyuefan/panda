@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "panda/routers"
+	_ "panda/transaction"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
