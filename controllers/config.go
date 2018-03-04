@@ -22,7 +22,7 @@ func GetConfigData() models.Config {
 	return configData
 }
 
-func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType) {
+func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType, mat map[int64]*models.Attribute) {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -33,6 +33,7 @@ func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType) {
 	configData.CatchTimeIntervel = conf.CatchTimeIntervel
 	configData.TrainLimit = conf.TrainLimit
 	configData.SetMapType(mtx)
+	configData.SetMapAttr(mat)
 }
 
 type ConfigDataController struct {
@@ -41,12 +42,14 @@ type ConfigDataController struct {
 
 func (c *ConfigDataController) LoadConfig() {
 	var (
-		id     int64
-		sid    string
-		err    error
-		conf   *models.Config
-		arryTx []*models.TransType
-		mTx    map[int64]*models.TransType
+		id       int64
+		sid      string
+		err      error
+		conf     *models.Config
+		arryTx   []*models.TransType
+		arryAttr []*models.Attribute
+		mTx      map[int64]*models.TransType
+		mAt      map[int64]*models.Attribute
 	)
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -72,7 +75,17 @@ func (c *ConfigDataController) LoadConfig() {
 		mTx[v.Id] = v
 	}
 
-	SetConfigData(conf, mTx)
+	if _, err = models.GetAllAttribute(&arryAttr); err != nil {
+		goto errDeal
+	}
+
+	mAt = make(map[int64]*models.Attribute, 0)
+
+	for _, v := range arryAttr {
+		mAt[v.Id] = v
+	}
+
+	SetConfigData(conf, mTx, mAt)
 
 	if backServer != nil {
 		backServer.OnStop()

@@ -2,6 +2,7 @@ package arithmetic
 
 import (
 	"testing"
+	"time"
 )
 
 func TestGetRand(t *testing.T) {

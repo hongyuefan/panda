@@ -41,9 +41,21 @@ func CatchResult(hash string, comp string) (result int, err error) {
 	return
 }
 
-func income(b byte) float32 {
-	if int(b) == int(time.Now().Weekday()) {
-		return Result_Multiple
+func TrainResult(hash string, N int) (statue int, err error) {
+
+	p, err := SplitTx_Trim_N(hash, N)
+	if err != nil {
+		return
 	}
-	return Result_Normal
+	weekDay := int(time.Now().Weekday())
+
+	if p == weekDay {
+		statue = 2
+		return
+	}
+	if p >= 0 && p <= 6 {
+		statue = 1
+		return
+	}
+	return
 }

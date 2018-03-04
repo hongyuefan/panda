@@ -13,10 +13,19 @@ type Config struct {
 	JudgeTime         int    `orm:"column(judge_time_sleep)"`
 	ownerPrv          string
 	maptsType         map[int64]*TransType
+	mapattrType       map[int64]*Attribute
 }
 
 func (t *Config) TableName() string {
 	return "config"
+}
+
+func (t *Config) SetMapAttr(m map[int64]*Attribute) {
+	t.mapattrType = m
+}
+
+func (t *Config) GetMapAttr() map[int64]*Attribute {
+	return t.mapattrType
 }
 
 func (t *Config) SetMapType(m map[int64]*TransType) {

@@ -89,6 +89,10 @@ func (s *BackServer) JudgeResult(itype int64, txhash string, txid, uid, pid int6
 	}
 }
 
+func (s *BackServer) TrainResult(txhash string, txid, uid, pid int64) {
+
+}
+
 func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 	var (
 		err    error
