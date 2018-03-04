@@ -10,11 +10,12 @@ import (
 )
 
 type Attrvalue struct {
-	Id    int        `orm:"column(id);auto"`
-	Pid   uint       `orm:"column(pid)"`
-	Uid   *Player    `orm:"column(uid);rel(fk)"`
-	Aid   *Attribute `orm:"column(aid);rel(fk)"`
-	Value string     `orm:"column(value);size(64);null"`
+	Id    int64  `orm:"column(id);auto"`
+	Pid   int64  `orm:"column(pid)"`
+	Uid   int64  `orm:"column(uid)"`
+	Aid   int64  `orm:"column(aid)"`
+	Years int    `orm:"column(years)"`
+	Value string `orm:"column(value);size(64);null"`
 }
 
 func (t *Attrvalue) TableName() string {
@@ -35,7 +36,7 @@ func AddAttrvalue(m *Attrvalue) (id int64, err error) {
 
 // GetAttrvalueById retrieves Attrvalue by Id. Returns error if
 // Id doesn't exist
-func GetAttrvalueById(id int) (v *Attrvalue, err error) {
+func GetAttrvalueById(id int64) (v *Attrvalue, err error) {
 	o := orm.NewOrm()
 	v = &Attrvalue{Id: id}
 	if err = o.Read(v); err == nil {
@@ -139,7 +140,7 @@ func UpdateAttrvalueById(m *Attrvalue) (err error) {
 
 // DeleteAttrvalue deletes Attrvalue by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteAttrvalue(id int) (err error) {
+func DeleteAttrvalue(id int64) (err error) {
 	o := orm.NewOrm()
 	v := Attrvalue{Id: id}
 	// ascertain id exists in the database

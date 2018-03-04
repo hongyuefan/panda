@@ -1,6 +1,7 @@
 package arithmetic
 
 import (
+	"strings"
 	"time"
 )
 
@@ -9,16 +10,35 @@ const (
 	Result_Normal   = 1
 )
 
-func CatchPanda(hash string)
-func Rule(TrimN int, hash string) (result float32, err error) {
+func CatchResult(hash string, comp string) (result int, err error) {
 
-	var b byte
+	comp = strings.Replace(comp, ".", "", -1)
 
-	if b, err = SplitTx_Trim_N(hash, TrimN); err != nil {
-		return 0, err
+	h1, err := SplitTx_Trim_N(hash, 1)
+	if err != nil {
+		return
+	}
+	h2, err := SplitTx_Trim_N(hash, 2)
+	if err != nil {
+		return
 	}
 
-	return income(b), nil
+	c1, err := SplitTx_N(comp, 1)
+	if err != nil {
+		return
+	}
+	c2, err := SplitTx_N(comp, 2)
+	if err != nil {
+		return
+	}
+
+	if c1 > h2 || (c1 == h2 && c2 > h1) {
+		result = 1
+	}
+	if c1 == h2 && c2 == h1 {
+		result = 2
+	}
+	return
 }
 
 func income(b byte) float32 {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,25 +29,45 @@ func SplitTx(tx string, n int) (arry []byte, err error) {
 }
 
 //获取tx倒数第n个数字
-func SplitTx_Trim_N(tx string, n int) (b byte, err error) {
+func SplitTx_Trim_N(tx string, n int) (b int, err error) {
+
 	hTx := strings.TrimPrefix(strings.ToLower(tx), "0x")
-	arry, err := hex.DecodeString(hTx)
+
+	return HexToI(hTx[len(hTx)-n : len(hTx)-n+1])
+
+}
+
+func HexToI(a string) (b int, err error) {
+
+	var ok bool
+
+	m := make(map[string]int, 16)
+
+	m["a"] = 10
+	m["b"] = 11
+	m["c"] = 12
+	m["d"] = 13
+	m["e"] = 14
+	m["f"] = 15
+
+	b, err = strconv.Atoi(a)
 	if err != nil {
-		return
+		err = nil
+		if b, ok = m[a]; !ok {
+			err = fmt.Errorf("hex not right")
+		}
 	}
-	b = arry[len(arry)-n] % 0x0f
 	return
 }
 
 //获取第n个数字
-func SplitTx_N(value string, n int) (b byte, err error) {
+func SplitTx_N(tx string, n int) (b int, err error) {
 	hTx := strings.TrimPrefix(strings.ToLower(tx), "0x")
-	arry, err := hex.DecodeString(hTx)
-	if err != nil {
+	if n > len(hTx) {
+		err = fmt.Errorf("n longer than tx")
 		return
 	}
-	b = arry[len(arry)-n] % 0x0f
-	return
+	return HexToI(hTx[n-1 : n])
 }
 
 //b对m取模

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -9,15 +10,16 @@ import (
 )
 
 type TransQ struct {
-	Id     int     `orm:"column(id);auto"`
-	TxHash string  `orm:"column(txhash);size(128)"`
-	Name   string  `orm:"column(name);size(64)"`
-	Type   int     `orm:"column(type);null"`
-	Status int     `orm:"column(status);null"`
-	UID    int     `orm:"column(uid);null"`
-	Fee    float64 `orm:"column(fee);null"`
-	Amount float64 `orm:"column(amount);null"`
-	Time   int64   `orm:"column(transtime);null"`
+	Id     int64  `orm:"column(id);auto"`
+	TxHash string `orm:"column(txhash);size(128)"`
+	Name   string `orm:"column(name);size(64)"`
+	Type   int64  `orm:"column(type);null"`
+	Status int    `orm:"column(status);null"`
+	UID    int64  `orm:"column(uid)"`
+	PID    int64  `orm:"column(pid)"`
+	Fee    string `orm:"column(fee);size(128)"`
+	Amount string `orm:"column(amount);size(128)"`
+	Time   int64  `orm:"column(transtime);null"`
 }
 
 func init() {
@@ -26,6 +28,24 @@ func init() {
 
 func (t *TransQ) TableName() string {
 	return "transaction"
+}
+
+func AddTrans(m *TransQ) (id int64, err error) {
+	o := orm.NewOrm()
+	id, err = o.Insert(m)
+	return
+}
+func UpdateTransById(m *TransQ, cols ...string) (err error) {
+	o := orm.NewOrm()
+	v := TransQ{Id: m.Id}
+	// ascertain id exists in the database
+	if err = o.Read(&v); err == nil {
+		var num int64
+		if num, err = o.Update(m, cols...); err == nil {
+			fmt.Println("Number of records updated in database:", num)
+		}
+	}
+	return
 }
 
 func GetTrans(query map[string]string, fields []string, sortby []string, order []string, offset int64, limit int64) (ml []interface{}, err error) {

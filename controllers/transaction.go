@@ -1,8 +1,11 @@
 package controllers
 
 import (
-	"errors"
+	"panda/models"
+	trans "panda/transaction"
 	"panda/types"
+	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -11,39 +14,126 @@ type TransactionContoller struct {
 	beego.Controller
 }
 
-var (
-	PublicKey_Setting string = "0xfab9898d9898s988c898989876756787879809-0-90898"
-	PrivKey_Setting   string
-)
+func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount string) (tId int64, err error) {
 
-func (t *TransactionContoller) Transactions(ntype int, sourPub, sourPriv string, amount uint64) (txhash string, err error) {
+	var (
+		mPlay  *models.Player
+		txhash string
+		conf   models.Config
+	)
 
-	if err = ValidatePublicKey(sourPub); err != nil {
+	conf = GetConfigData()
+
+	if mPlay, err = models.GetPlayerById(uid); err != nil {
 		return
 	}
 
 	switch ntype {
-	case types.Type_Catch:
-		if err = ValidatePrivKey(sourPriv); err != nil {
+
+	case types.Trans_Type_WithDrawal: //提现
+		var result int
+		if result, err = compareAmount(amount, mPlay.Balance); err != nil {
+			return 0, err
+		}
+		if result > 0 {
+			return 0, types.Error_Trans_AmountOver
+		}
+		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, mPlay.Pubkey, amount); err != nil {
 			return
 		}
-		return DoTransaction(sourPub, sourPriv, PublicKey_Setting, amount)
-	case types.Type_Train:
-		if err = ValidatePrivKey(sourPriv); err != nil {
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		return t.InsertTransQ(uid, pid, types.Trans_Type_WithDrawal, amount,
+			conf.GetMapType()[types.Trans_Type_WithDrawal].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_WithDrawal].Name)
+
+	case types.Trans_Type_Catch: //捕捉
+		if time.Now().Unix()-mPlay.LastCatchTime < conf.CatchTimeIntervel {
+			return 0, types.Error_Trans_CatchIntervel
+		}
+		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Catch].Amount, mPlay.Balance)
+		if err != nil {
+			return 0, err
+		}
+		if result > 0 {
+			return 0, types.Error_Trans_AmountOver
+		}
+
+		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Catch].Amount); err != nil {
+			return 0, err
+		}
+
+		UpCatchTime(uid)
+
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		return t.InsertTransQ(uid, pid, types.Trans_Type_Catch, conf.GetMapType()[types.Trans_Type_Catch].Amount,
+			conf.GetMapType()[types.Trans_Type_Catch].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_Catch].Name)
+
+	case types.Trans_Type_Train: //训练
+		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, mPlay.Balance)
+		if err != nil {
+			return 0, err
+		}
+		if result > 0 {
+			return 0, types.Error_Trans_AmountOver
+		}
+		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Train].Amount); err != nil {
+			return 0, err
+		}
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		return t.InsertTransQ(uid, pid, types.Trans_Type_Train, conf.GetMapType()[types.Trans_Type_Train].Amount,
+			conf.GetMapType()[types.Trans_Type_Train].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_Train].Name)
+
+	case types.Trans_Type_Bonus: //分红
+		if txhash, err = trans.DoTransaction("SB7XB25ZIZB3XCNUXFY64NNIY5WNWPVCMBOLKPPMWWADHKUBM4HZOXVO", mPlay.PubPublic, amount); err != nil {
 			return
 		}
-		return DoTransaction(sourPub, sourPriv, PublicKey_Setting, amount)
-	case types.Type_Bonus:
-		return DoTransaction(PublicKey_Setting, PrivKey_Setting, sourPub, amount)
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		return t.InsertTransQ(uid, pid, types.Trans_Type_Bonus, amount,
+			conf.GetMapType()[types.Trans_Type_Bonus].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_Bonus].Name)
+
 	}
-	return "", errors.New("transaction type not right")
+	return 0, types.Error_Trans_MisType
+
 }
 
-func (t *TransaccountController) IsTransactionSuccess(txhash string) (err error) {
-	return nil
+func (t *TransactionContoller) InsertTransQ(uid, pid, ntype int64, amount, fee, txhash, stype string) (tid int64, err error) {
+
+	transQ := &models.TransQ{
+		TxHash: txhash,
+		Name:   stype,
+		Type:   ntype,
+		Status: types.Trans_Status_Waiting,
+		UID:    uid,
+		PID:    pid,
+		Fee:    fee,
+		Amount: amount,
+		Time:   time.Now().Unix(),
+	}
+	if tid, err = models.AddTrans(transQ); err != nil {
+		beego.BeeLogger.Info("InsertTransQ Failed ,need mamual operation, txhash:%v,type:%v,uid:%v,fee:%v,amount:%v", txhash, ntype, uid, fee, amount)
+	}
+	return
 }
 
-func DoTransaction(sourPub, sourPriv, desPub string, amount uint64) (txhash string, err error) {
+func compareAmount(amount, balance string) (int, error) {
 
-	return "0x12345678", nil
+	famount, err := strconv.ParseFloat(amount, 10)
+	if err != nil {
+		return 0, err
+	}
+
+	fbalance, err := strconv.ParseFloat(balance, 10)
+	if err != nil {
+		return 0, err
+	}
+
+	if famount > fbalance {
+		return 1, nil
+	} else if famount == fbalance {
+		return 0, nil
+	}
+	return -1, nil
 }

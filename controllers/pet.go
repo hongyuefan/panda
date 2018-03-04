@@ -55,7 +55,7 @@ func (c *PetController) Post() {
 // @router /:id [get]
 func (c *PetController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v, err := models.GetPetById(id)
 	if err != nil {
 		c.Data["json"] = err.Error()
@@ -136,21 +136,21 @@ func (c *PetController) GetAll() {
 // @Success 200 {object} models.Pet
 // @Failure 403 :id is not int
 // @router /:id [put]
-func (c *PetController) Put() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v := models.Pet{Id: id}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdatePetById(&v); err == nil {
-			c.Data["json"] = "OK"
-		} else {
-			c.Data["json"] = err.Error()
-		}
-	} else {
-		c.Data["json"] = err.Error()
-	}
-	c.ServeJSON()
-}
+//func (c *PetController) Put() {
+//	idStr := c.Ctx.Input.Param(":id")
+//	id, _ := strconv.Atoi(idStr)
+//	v := models.Pet{Id: id}
+//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+//		if err := models.UpdatePetById(&v); err == nil {
+//			c.Data["json"] = "OK"
+//		} else {
+//			c.Data["json"] = err.Error()
+//		}
+//	} else {
+//		c.Data["json"] = err.Error()
+//	}
+//	c.ServeJSON()
+//}
 
 // Delete ...
 // @Title Delete
@@ -159,13 +159,13 @@ func (c *PetController) Put() {
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
 // @router /:id [delete]
-func (c *PetController) Delete() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	if err := models.DeletePet(id); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
-	}
-	c.ServeJSON()
-}
+//func (c *PetController) Delete() {
+//	idStr := c.Ctx.Input.Param(":id")
+//	id, _ := strconv.Atoi(idStr)
+//	if err := models.DeletePet(id); err == nil {
+//		c.Data["json"] = "OK"
+//	} else {
+//		c.Data["json"] = err.Error()
+//	}
+//	c.ServeJSON()
+//}

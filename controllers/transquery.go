@@ -16,32 +16,35 @@ type TransQContoller struct {
 
 func (t *TransQContoller) GetTransQ() {
 	var (
-		err                     error
-		data                    types.TransQData
-		datas                   []types.TransQData
-		userId                  int64
-		spage, sperpage, sorder string
-		page, perpage           int64
-		query                   map[string]string
-		ml                      []interface{}
-		token                   string
-		count                   int
+		err                            error
+		data                           types.TransQData
+		datas                          []types.TransQData
+		userId                         int64
+		spage, sperpage, sorder, stype string
+		page, perpage                  int64
+		query                          map[string]string
+		ml                             []interface{}
+		count                          int
+		conf                           models.Config
 	)
 
 	if err = t.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
-	if token, err = ParseToken(t.Ctx.Input.Header("Authorization")); err != nil {
+
+	if userId, err = ParseAndValidToken(t.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal
 	}
-	if userId, err = TokenValidate(token); err != nil {
-		goto errDeal
-	}
+
 	query = make(map[string]string, 0)
 	query["uid"] = fmt.Sprintf("%v", userId)
 	spage = t.Ctx.Request.FormValue("page")
 	sperpage = t.Ctx.Request.FormValue("perpage")
 	sorder = t.Ctx.Request.FormValue("order")
+	stype = t.Ctx.Request.FormValue("type")
+	if stype != "" {
+		query["type"] = fmt.Sprintf("%v", stype)
+	}
 
 	if page, err = strconv.ParseInt(spage, 10, 64); err != nil {
 		goto errDeal
@@ -69,13 +72,16 @@ func (t *TransQContoller) GetTransQ() {
 		}
 	}
 
+	conf = GetConfigData()
+
 	for _, v := range ml {
+		data.TxId = fmt.Sprintf("%v", v.(models.TransQ).Id)
 		data.Amount = fmt.Sprintf("%v", v.(models.TransQ).Amount)
 		data.Name = v.(models.TransQ).Name
 		data.TxHash = v.(models.TransQ).TxHash
 		data.Time = fmt.Sprintf("%v", v.(models.TransQ).Time)
 		data.Type = fmt.Sprintf("%v", v.(models.TransQ).Type)
-		data.Status = TransTypeString(v.(models.TransQ).Type) + TranstateString(v.(models.TransQ).Type)
+		data.Status = conf.GetMapType()[v.(models.TransQ).Type].Name + TranstateString(v.(models.TransQ).Status)
 		datas = append(datas, data)
 		count++
 	}

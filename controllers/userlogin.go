@@ -37,10 +37,6 @@ func (c *UserLoginController) VerifyUser() {
 		goto errDeal
 	}
 
-	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqVerify); err != nil {
-	//		goto errDeal
-	//	}
-
 	reqVerify.UserName = c.Ctx.Request.FormValue("userName")
 	reqVerify.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
 

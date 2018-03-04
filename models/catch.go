@@ -10,14 +10,14 @@ import (
 )
 
 type Catch struct {
-	Id         int     `orm:"column(id);auto"`
-	Uid        *Player `orm:"column(uid);rel(fk)"`
-	Year       int     `orm:"column(year);null"`
-	Createtime int64   `orm:"column(createtime);null"`
-	Powerate   string  `orm:"column(powerate);size(32);null"`
-	Txid       int     `orm:"column(txid);null"`
-	Result     int     `orm:"column(result);null"`
-	Pid        int     `orm:"column(pid);null"`
+	Id         int64  `orm:"column(id);auto"`
+	Uid        int64  `orm:"column(uid)"`
+	Year       int    `orm:"column(year);null"`
+	Createtime int64  `orm:"column(createtime);null"`
+	Txid       int64  `orm:"column(txid);null"`
+	Result     int    `orm:"column(result);null"`
+	Pid        int64  `orm:"column(pid);null"`
+	Memo       string `orm:"column(memo);size(256)"`
 }
 
 func (t *Catch) TableName() string {
@@ -38,7 +38,7 @@ func AddCatch(m *Catch) (id int64, err error) {
 
 // GetCatchById retrieves Catch by Id. Returns error if
 // Id doesn't exist
-func GetCatchById(id int) (v *Catch, err error) {
+func GetCatchById(id int64) (v *Catch, err error) {
 	o := orm.NewOrm()
 	v = &Catch{Id: id}
 	if err = o.Read(v); err == nil {
@@ -142,7 +142,7 @@ func UpdateCatchById(m *Catch) (err error) {
 
 // DeleteCatch deletes Catch by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteCatch(id int) (err error) {
+func DeleteCatch(id int64) (err error) {
 	o := orm.NewOrm()
 	v := Catch{Id: id}
 	// ascertain id exists in the database

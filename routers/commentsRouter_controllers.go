@@ -103,30 +103,6 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["panda/controllers:CatchController"] = append(beego.GlobalControllerRouter["panda/controllers:CatchController"],
-		beego.ControllerComments{
-			Method: "GetOne",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:CatchController"] = append(beego.GlobalControllerRouter["panda/controllers:CatchController"],
-		beego.ControllerComments{
-			Method: "Put",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"put"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:CatchController"] = append(beego.GlobalControllerRouter["panda/controllers:CatchController"],
-		beego.ControllerComments{
-			Method: "Delete",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"delete"},
-			MethodParams: param.Make(),
-			Params: nil})
-
 	beego.GlobalControllerRouter["panda/controllers:FeedeffectController"] = append(beego.GlobalControllerRouter["panda/controllers:FeedeffectController"],
 		beego.ControllerComments{
 			Method: "Post",
@@ -348,22 +324,6 @@ func init() {
 			Method: "GetOne",
 			Router: `/:id`,
 			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:PetController"] = append(beego.GlobalControllerRouter["panda/controllers:PetController"],
-		beego.ControllerComments{
-			Method: "Put",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"put"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:PetController"] = append(beego.GlobalControllerRouter["panda/controllers:PetController"],
-		beego.ControllerComments{
-			Method: "Delete",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"delete"},
 			MethodParams: param.Make(),
 			Params: nil})
 

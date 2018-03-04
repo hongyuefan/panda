@@ -106,7 +106,11 @@ func (o *OpChain) parseResultXDR(data string) (ok bool, err error) {
 	return
 }
 
-func (o *OpChain) QueryTransaction(txhash string) (ledger int64, err error) {
+/*result: 0 网络错误或hash尚未完成，下次重试
+  result：1  交易成功
+  result: -1 交易失败
+*/
+func (o *OpChain) QueryTransaction(txhash string) (result int, err error) {
 
 	var (
 		rspChain RspChain
@@ -134,7 +138,7 @@ func (o *OpChain) QueryTransaction(txhash string) (ledger int64, err error) {
 	}
 
 	if ok, err = o.parseResultXDR(rspChain.ResultXdr); !ok {
-		return
+		return -1, err
 	}
-	return rspChain.Ledger, nil
+	return 1, nil
 }

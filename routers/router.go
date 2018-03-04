@@ -28,6 +28,9 @@ func init() {
 	beego.Router("/v1/tsxm/modifyname", &controllers.UserLoginController{}, "post:ModifyNickName")
 	beego.Router("/v1/tsxm/transaction", &controllers.TransQContoller{}, "get:GetTransQ")
 	beego.Router("/v1/tsxm/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWord")
+	beego.Router("/v1/tsxm/loadconfig", &controllers.ConfigDataController{}, "get:LoadConfig")
+	beego.Router("/v1/tsxm/capture", &controllers.PandaCatchController{}, "get:HandlerPandaCatch")
+	beego.Router("/v1/tsxm/capture/result", &controllers.PandaCatchController{}, "get:HandlerGetPandaCatch")
 
 	ns := beego.NewNamespace("/v1",
 

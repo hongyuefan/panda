@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"panda/models"
-	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego"
@@ -18,7 +17,7 @@ type CatchController struct {
 // URLMapping ...
 func (c *CatchController) URLMapping() {
 	c.Mapping("Post", c.Post)
-	c.Mapping("GetOne", c.GetOne)
+	//	c.Mapping("GetOne", c.GetOne)
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
@@ -53,17 +52,17 @@ func (c *CatchController) Post() {
 // @Success 200 {object} models.Catch
 // @Failure 403 :id is empty
 // @router /:id [get]
-func (c *CatchController) GetOne() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v, err := models.GetCatchById(id)
-	if err != nil {
-		c.Data["json"] = err.Error()
-	} else {
-		c.Data["json"] = v
-	}
-	c.ServeJSON()
-}
+//func (c *CatchController) GetOne() {
+//	idStr := c.Ctx.Input.Param(":id")
+//	id, _ := strconv.Atoi(idStr)
+//	v, err := models.GetCatchById(id)
+//	if err != nil {
+//		c.Data["json"] = err.Error()
+//	} else {
+//		c.Data["json"] = v
+//	}
+//	c.ServeJSON()
+//}
 
 // GetAll ...
 // @Title Get All
@@ -136,21 +135,21 @@ func (c *CatchController) GetAll() {
 // @Success 200 {object} models.Catch
 // @Failure 403 :id is not int
 // @router /:id [put]
-func (c *CatchController) Put() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v := models.Catch{Id: id}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateCatchById(&v); err == nil {
-			c.Data["json"] = "OK"
-		} else {
-			c.Data["json"] = err.Error()
-		}
-	} else {
-		c.Data["json"] = err.Error()
-	}
-	c.ServeJSON()
-}
+//func (c *CatchController) Put() {
+//	idStr := c.Ctx.Input.Param(":id")
+//	id, _ := strconv.Atoi(idStr)
+//	v := models.Catch{Id: id}
+//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+//		if err := models.UpdateCatchById(&v); err == nil {
+//			c.Data["json"] = "OK"
+//		} else {
+//			c.Data["json"] = err.Error()
+//		}
+//	} else {
+//		c.Data["json"] = err.Error()
+//	}
+//	c.ServeJSON()
+//}
 
 // Delete ...
 // @Title Delete
@@ -159,13 +158,13 @@ func (c *CatchController) Put() {
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
 // @router /:id [delete]
-func (c *CatchController) Delete() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteCatch(id); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
-	}
-	c.ServeJSON()
-}
+//func (c *CatchController) Delete() {
+//	idStr := c.Ctx.Input.Param(":id")
+//	id, _ := strconv.Atoi(idStr)
+//	if err := models.DeleteCatch(id); err == nil {
+//		c.Data["json"] = "OK"
+//	} else {
+//		c.Data["json"] = err.Error()
+//	}
+//	c.ServeJSON()
+//}

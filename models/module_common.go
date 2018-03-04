@@ -22,6 +22,21 @@ func (c *Common) CommonGetOne(v interface{}, col ...string) (err error) {
 	return
 }
 
+func (c *Common) CommonGetFilterAll(table string, filter map[string]interface{}, arryData interface{}) (count int64, err error) {
+
+	qs := c.o.QueryTable(table)
+
+	for k, v := range filter {
+		qs = qs.Filter(k, v)
+	}
+
+	return qs.All(arryData)
+}
+
+func (c *Common) CommonGetAll(table string, arryData interface{}) (count int64, err error) {
+	return c.o.QueryTable(table).All(arryData)
+}
+
 func (c *Common) CommonInsert(v interface{}) (id int64, err error) {
 	if id, err = c.o.Insert(v); err != nil {
 		return 0, err

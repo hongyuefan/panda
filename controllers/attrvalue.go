@@ -55,7 +55,7 @@ func (c *AttrvalueController) Post() {
 // @router /:id [get]
 func (c *AttrvalueController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v, err := models.GetAttrvalueById(id)
 	if err != nil {
 		c.Data["json"] = err.Error()
@@ -138,7 +138,7 @@ func (c *AttrvalueController) GetAll() {
 // @router /:id [put]
 func (c *AttrvalueController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v := models.Attrvalue{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateAttrvalueById(&v); err == nil {
@@ -161,7 +161,7 @@ func (c *AttrvalueController) Put() {
 // @router /:id [delete]
 func (c *AttrvalueController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	if err := models.DeleteAttrvalue(id); err == nil {
 		c.Data["json"] = "OK"
 	} else {

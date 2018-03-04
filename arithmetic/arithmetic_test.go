@@ -17,6 +17,9 @@ func TestTrain(t *testing.T) {
 	b, _ := SplitTx("0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892bf5", 5)
 	t.Log(b)
 
+	m, _ := GetMod(b[0], 16)
+	t.Log(m)
+
 	t.Log(OverturnArray(b))
 	return
 }
@@ -30,19 +33,21 @@ func TestGetRandLimit(t *testing.T) {
 
 func TestSplitTx_Trim_N(t *testing.T) {
 
-	b, _ := SplitTx_Trim_N("0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892bf5", 1)
-
+	b, err := SplitTx_Trim_N("0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892bf4", 3)
+	if err != nil {
+		panic(err)
+	}
 	t.Log(b)
 
 	return
 
 }
 
-func TestRule(t *testing.T) {
-
-	b, _ := Rule(1, "0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892bf4")
-
-	t.Log(b)
-
+func TestCatchResult(t *testing.T) {
+	result, err := CatchResult("0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892b28", "32.43")
+	if err != nil {
+		panic(err)
+	}
+	t.Log(result)
 	return
 }

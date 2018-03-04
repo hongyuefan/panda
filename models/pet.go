@@ -10,13 +10,14 @@ import (
 )
 
 type Pet struct {
-	Id      int     `orm:"column(id);auto" description:"自增"`
-	Petname string  `orm:"column(petname);size(64);null" description:"宠物名称"`
-	Years   uint    `orm:"column(years)" description:"第几代"`
-	Uid     *Player `orm:"column(uid);rel(fk)" description:"用户ID"`
-	Cid     *Catch  `orm:"column(cid);rel(fk)"`
-	Attribs string  `orm:"column(attribs);size(64);null"`
-	Figure  string  `orm:"column(figure);size(128);null"`
+	Id      int64  `orm:"column(id);auto" description:"自增"`
+	Petname string `orm:"column(petname);size(64);null" description:"宠物名称"`
+	Years   int    `orm:"column(years)" description:"第几代"`
+	Uid     int64  `orm:"column(uid)" description:"用户ID"`
+	Cid     int64  `orm:"column(cid)"`
+	Fid     int64  `orm:"column(fid)"`
+	Status  int    `orm:"column(status)"`
+	SvgPath string `orm:"column(svg_path);size(256)"`
 }
 
 func (t *Pet) TableName() string {
@@ -37,7 +38,7 @@ func AddPet(m *Pet) (id int64, err error) {
 
 // GetPetById retrieves Pet by Id. Returns error if
 // Id doesn't exist
-func GetPetById(id int) (v *Pet, err error) {
+func GetPetById(id int64) (v *Pet, err error) {
 	o := orm.NewOrm()
 	v = &Pet{Id: id}
 	if err = o.Read(v); err == nil {
@@ -141,7 +142,7 @@ func UpdatePetById(m *Pet) (err error) {
 
 // DeletePet deletes Pet by Id and returns error if
 // the record to be deleted doesn't exist
-func DeletePet(id int) (err error) {
+func DeletePet(id int64) (err error) {
 	o := orm.NewOrm()
 	v := Pet{Id: id}
 	// ascertain id exists in the database
