@@ -42,7 +42,7 @@ func (t *TransQContoller) GetTransQ() {
 	sperpage = t.Ctx.Request.FormValue("perpage")
 	sorder = t.Ctx.Request.FormValue("order")
 	stype = t.Ctx.Request.FormValue("type")
-	if stype != "" {
+	if stype != "" && stype != "0" {
 		query["type"] = fmt.Sprintf("%v", stype)
 	}
 
