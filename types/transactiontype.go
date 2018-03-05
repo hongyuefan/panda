@@ -10,6 +10,16 @@ type RspTransQ struct {
 }
 
 var (
+	Attr_Type_Minjie  int64 = 0x01
+	Attr_Type_Liliang int64 = 0x02
+	Attr_Type_Zhili   int64 = 0x03
+)
+
+var (
+	Train_Multi_Ratio = 10
+)
+
+var (
 	Trans_Type_WithDrawal int64 = 1
 	Trans_Type_Catch      int64 = 2
 	Trans_Type_Train      int64 = 3

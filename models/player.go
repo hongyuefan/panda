@@ -23,7 +23,6 @@ type Player struct {
 	Paypass       string `orm:"column(paypass);size(128);null"`
 	UserType      string `orm:"column(usertype);size(32);null"`
 	Avatar        string `orm:"column(avatar);size(256);null"`
-	Balance       string `orm:"column(balance);size(128);null"`
 	PubPublic     string `orm:"column(pub_pubkey);size(128);null"`
 	PubPrivkey    string `orm:"column(pub_privkey);size(128);null"`
 	LastCatchTime int64  `orm:"column(lastcatchtime)"`

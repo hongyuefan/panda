@@ -2,6 +2,7 @@ package stellar
 
 import (
 	"testing"
+	"time"
 )
 
 func TestQueryTransaction(t *testing.T) {
@@ -20,6 +21,8 @@ func TestQueryTransaction(t *testing.T) {
 
 	t.Log("txhash:", txhash)
 
+	time.Sleep(3 * time.Second)
+
 	leger, err := opc.QueryTransaction(txhash)
 
 	if err != nil {
@@ -27,5 +30,14 @@ func TestQueryTransaction(t *testing.T) {
 		return
 	}
 	t.Log(leger)
+
+	balance, err := opc.GetBalance("GBD3XKDFVKSRFSL7YXYVE6EVUX7ZD2X3FPJQUDEVJM7D7BXUNH3QJOQX")
+
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	t.Log(balance)
+
 	return
 }

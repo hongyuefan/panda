@@ -31,8 +31,14 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 	switch ntype {
 
 	case types.Trans_Type_WithDrawal: //提现
-		var result int
-		if result, err = compareAmount(amount, mPlay.Balance); err != nil {
+		var (
+			result  int
+			balance string
+		)
+		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
+			return 0, err
+		}
+		if result, err = compareAmount(amount, balance); err != nil {
 			return 0, err
 		}
 		if result > 0 {
@@ -50,7 +56,11 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 		if time.Now().Unix()-mPlay.LastCatchTime < conf.CatchTimeIntervel {
 			return 0, types.Error_Trans_CatchIntervel
 		}
-		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Catch].Amount, mPlay.Balance)
+		balance, err := trans.GetBalance(mPlay.PubPublic)
+		if err != nil {
+			return 0, err
+		}
+		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Catch].Amount, balance)
 		if err != nil {
 			return 0, err
 		}
@@ -70,7 +80,11 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			conf.GetMapType()[types.Trans_Type_Catch].Name)
 
 	case types.Trans_Type_Train: //训练
-		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, mPlay.Balance)
+		balance, err := trans.GetBalance(mPlay.PubPublic)
+		if err != nil {
+			return 0, err
+		}
+		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, balance)
 		if err != nil {
 			return 0, err
 		}

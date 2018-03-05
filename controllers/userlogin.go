@@ -225,12 +225,12 @@ errDeal:
 
 func (c *UserLoginController) UserLogin() {
 	var (
-		reqLogin types.ReqLogin
-		rspLogin types.RspRegist
-		mUser    *models.Player
-		orm      *models.Common
-		token    string
-		err      error
+		reqLogin       types.ReqLogin
+		rspLogin       types.RspRegist
+		mUser          *models.Player
+		orm            *models.Common
+		token, balance string
+		err            error
 	)
 
 	//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
@@ -260,6 +260,10 @@ func (c *UserLoginController) UserLogin() {
 			goto errDeal
 		}
 
+		if balance, err = t.GetBalance(mUser.PubPublic); err != nil {
+			goto errDeal
+		}
+
 		rspLogin = types.RspRegist{
 			RspBase: types.RspBase{
 				MemberIsExist: User_Exist,
@@ -273,7 +277,7 @@ func (c *UserLoginController) UserLogin() {
 				UserType:      UserType_Normal,
 				Token:         token,
 				Avatar:        mUser.Avatar,
-				Balance:       mUser.Balance,
+				Balance:       balance,
 				Freeze:        fmt.Sprintf("%v", mUser.Isdel),
 				WalletAddress: mUser.Pubkey,
 				Mypets:        "",

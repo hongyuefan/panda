@@ -10,7 +10,7 @@ type Attribute struct {
 	Id       int64  `orm:"column(id);auto"`
 	Attrname string `orm:"column(attrname);size(32);null"`
 	Normal   string `orm:"column(normal);size(32);null"`
-	Special  int8   `orm:"column(special);size(32)"`
+	Special  string `orm:"column(special);size(32)"`
 }
 
 func (t *Attribute) TableName() string {

@@ -30,3 +30,7 @@ func DoTransaction(sPrivkey, dPublic, amount string) (txhash string, err error) 
 func QueryTransaction(txhash string) (int, error) {
 	return trans.QueryTransaction(txhash)
 }
+
+func GetBalance(address string) (balance string, err error) {
+	return trans.GetBalance(address)
+}

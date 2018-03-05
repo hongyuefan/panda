@@ -26,6 +26,14 @@ type RspChain struct {
 	Ledger    int64  `json:"ledger"`
 }
 
+type Balance struct {
+	Amount    string `json:"balance"`
+	AssetType string `json:"asset_type"`
+}
+type Balances struct {
+	ArryBalance []*Balance `json:"balances"`
+}
+
 func NewOpChain(netWork string) *OpChain {
 	switch netWork {
 	case "dev":
@@ -50,6 +58,38 @@ func (o *OpChain) GenKeyPair() (pub, priv string, err error) {
 	}
 	pub = pair.Address()
 	priv = pair.Seed()
+	return
+}
+
+func (o *OpChain) GetBalance(address string) (balance string, err error) {
+
+	var balances Balances
+
+	url := o.provide.URL + "/accounts/" + address
+
+	rsp, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	if rsp.StatusCode != http.StatusOK {
+		err = fmt.Errorf("query account information %v error code %v", address, rsp.StatusCode)
+		return
+	}
+	buffer := new(bytes.Buffer)
+
+	if _, err = io.Copy(buffer, rsp.Body); err != nil {
+		return
+	}
+	if err = json.Unmarshal(buffer.Bytes(), &balances); err != nil {
+		return
+	}
+
+	for _, b := range balances.ArryBalance {
+		if b.AssetType == "native" {
+			balance = b.Amount
+			break
+		}
+	}
 	return
 }
 
