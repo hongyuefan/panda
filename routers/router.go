@@ -31,6 +31,8 @@ func init() {
 	beego.Router("/v1/tsxm/loadconfig", &controllers.ConfigDataController{}, "get:LoadConfig")
 	beego.Router("/v1/tsxm/capture", &controllers.PandaCatchController{}, "get:HandlerPandaCatch")
 	beego.Router("/v1/tsxm/capture/result", &controllers.PandaCatchController{}, "get:HandlerGetPandaCatch")
+	beego.Router("/v1/tsxm/setwallet", &controllers.WalletController{}, "get:SetWalletAddress")
+	beego.Router("/v1/tsxm/trainpet", &controllers.TrainController{}, "get:HandlerTrainPet")
 
 	ns := beego.NewNamespace("/v1",
 

@@ -102,7 +102,7 @@ func (c *PandaCatchController) HandlerPandaCatch() {
 		goto errDeal
 	}
 
-	if _, err = c.trans.Transactions(types.Trans_Type_Catch, userId, petId, ""); err != nil {
+	if txhash, err = c.trans.Transactions(types.Trans_Type_Catch, userId, petId, ""); err != nil {
 		goto errDeal
 	}
 

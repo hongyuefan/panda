@@ -10,9 +10,9 @@ type RspTransQ struct {
 }
 
 var (
-	Attr_Type_Minjie  int64 = 0x01
-	Attr_Type_Liliang int64 = 0x02
-	Attr_Type_Zhili   int64 = 0x03
+	Attr_Type_Minjie  int64 = 1
+	Attr_Type_Liliang int64 = 2
+	Attr_Type_Zhili   int64 = 3
 )
 
 var (

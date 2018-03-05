@@ -2,7 +2,6 @@ package arithmetic
 
 import (
 	"testing"
-	"time"
 )
 
 func TestGetRand(t *testing.T) {
@@ -42,6 +41,14 @@ func TestSplitTx_Trim_N(t *testing.T) {
 
 	return
 
+}
+
+func TestParse(t *testing.T) {
+	min, max, err := ParseLimit("1_2")
+	if err != nil {
+		panic(err)
+	}
+	t.Log(GetRand(min, max))
 }
 
 func TestCatchResult(t *testing.T) {

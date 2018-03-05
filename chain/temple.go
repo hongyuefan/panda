@@ -5,4 +5,5 @@ type ChainOp interface {
 	QueryTransaction(string) (int, error)
 	GenKeyPair() (string, string, error)
 	GetBalance(string) (string, error)
+	ValidatePublicKey(string) error
 }

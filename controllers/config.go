@@ -92,7 +92,7 @@ func (c *ConfigDataController) LoadConfig() {
 		backServer = nil
 	}
 
-	backServer = backserver.NewBackServer(conf)
+	backServer = backserver.NewBackServer(GetConfigData())
 	backServer.OnStart()
 
 	c.Ctx.Output.JSON(configData, false, false)

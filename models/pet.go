@@ -4,20 +4,22 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego/orm"
 )
 
 type Pet struct {
-	Id      int64  `orm:"column(id);auto" description:"自增"`
-	Petname string `orm:"column(petname);size(64);null" description:"宠物名称"`
-	Years   int    `orm:"column(years)" description:"第几代"`
-	Uid     int64  `orm:"column(uid)" description:"用户ID"`
-	Cid     int64  `orm:"column(cid)"`
-	Fid     int64  `orm:"column(fid)"`
-	Status  int    `orm:"column(status)"`
-	SvgPath string `orm:"column(svg_path);size(256)"`
+	Id         int64  `orm:"column(id);auto" description:"自增"`
+	Petname    string `orm:"column(petname);size(64);null" description:"宠物名称"`
+	Years      int    `orm:"column(years)" description:"第几代"`
+	Uid        int64  `orm:"column(uid)" description:"用户ID"`
+	Cid        int64  `orm:"column(cid)"`
+	Fid        int64  `orm:"column(fid)"`
+	Status     int    `orm:"column(status)"`
+	SvgPath    string `orm:"column(svg_path);size(256)"`
+	TrainTotle string `orm:"column(train_totle);size(128)"`
 }
 
 func (t *Pet) TableName() string {
@@ -127,13 +129,13 @@ func GetAllPet(query map[string]string, fields []string, sortby []string, order 
 
 // UpdatePet updates Pet by Id and returns error if
 // the record to be updated doesn't exist
-func UpdatePetById(m *Pet) (err error) {
+func UpdatePetById(m *Pet, cols ...string) (err error) {
 	o := orm.NewOrm()
 	v := Pet{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Update(m); err == nil {
+		if num, err = o.Update(m, cols...); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}
@@ -153,4 +155,27 @@ func DeletePet(id int64) (err error) {
 		}
 	}
 	return
+}
+
+func UpTrainTotle(pid int64, addAmount string) (err error) {
+
+	pet, err := GetPetById(pid)
+	if err != nil {
+		return
+	}
+
+	nTotle, err := strconv.ParseFloat(pet.TrainTotle, 64)
+	if err != nil {
+		return
+	}
+	nAmount, err := strconv.ParseFloat(addAmount, 64)
+	if err != nil {
+		return
+	}
+
+	Totle := nTotle + nAmount
+
+	pet.TrainTotle = fmt.Sprintf("%v", Totle)
+
+	return UpdatePetById(pet, "TrainTotle")
 }

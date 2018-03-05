@@ -10,6 +10,24 @@ import (
 	"time"
 )
 
+func ParseLimit(strLimit string) (min float64, max float64, err error) {
+
+	arrysLimit := strings.Split(strLimit, "_")
+
+	if len(arrysLimit) != 2 {
+		err = fmt.Errorf("conf attrivalue limit set error")
+		return
+	}
+	if min, err = strconv.ParseFloat(arrysLimit[0], 64); err != nil {
+		return
+	}
+	if max, err = strconv.ParseFloat(arrysLimit[1], 64); err != nil {
+		return
+	}
+	return
+
+}
+
 //获取（min，max）之间大小的随机数
 func GetRand(min float64, max float64) (result float64) {
 	source := rand.NewSource(time.Now().UnixNano())

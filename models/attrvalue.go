@@ -26,6 +26,16 @@ func init() {
 	orm.RegisterModel(new(Attrvalue))
 }
 
+func NewAttrvalue(pid, uid, aid int64, years int, value string) *Attrvalue {
+	return &Attrvalue{
+		Pid:   pid,
+		Uid:   uid,
+		Aid:   aid,
+		Years: years,
+		Value: value,
+	}
+}
+
 // AddAttrvalue insert a new Attrvalue into database and returns
 // last inserted Id on success.
 func AddAttrvalue(m *Attrvalue) (id int64, err error) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -159,6 +160,21 @@ func DeletePlayer(id int64) (err error) {
 		if num, err = o.Delete(&Player{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
+	}
+	return
+}
+
+func UpCatchTime(uid int64) (err error) {
+	var (
+		player *Player
+	)
+	if player, err = GetPlayerById(uid); err != nil {
+		return
+	}
+	player.LastCatchTime = time.Now().Unix()
+
+	if err = UpdatePlayerById(player, "LastCatchTime"); err != nil {
+		return
 	}
 	return
 }

@@ -34,3 +34,7 @@ func QueryTransaction(txhash string) (int, error) {
 func GetBalance(address string) (balance string, err error) {
 	return trans.GetBalance(address)
 }
+
+func ValidatePublicKey(address string) (err error) {
+	return trans.ValidatePublicKey(address)
+}

@@ -14,12 +14,11 @@ type TransactionContoller struct {
 	beego.Controller
 }
 
-func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount string) (tId int64, err error) {
+func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount string) (txhash string, err error) {
 
 	var (
-		mPlay  *models.Player
-		txhash string
-		conf   models.Config
+		mPlay *models.Player
+		conf  models.Config
 	)
 
 	conf = GetConfigData()
@@ -36,80 +35,88 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			balance string
 		)
 		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
-			return 0, err
+			return
 		}
 		if result, err = compareAmount(amount, balance); err != nil {
-			return 0, err
+			return
 		}
 		if result > 0 {
-			return 0, types.Error_Trans_AmountOver
+			err = types.Error_Trans_AmountOver
+			return
 		}
 		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, mPlay.Pubkey, amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		return t.InsertTransQ(uid, pid, types.Trans_Type_WithDrawal, amount,
+		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_WithDrawal, amount,
 			conf.GetMapType()[types.Trans_Type_WithDrawal].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_WithDrawal].Name)
+		return
 
 	case types.Trans_Type_Catch: //捕捉
+		var (
+			balance string
+			result  int
+		)
 		if time.Now().Unix()-mPlay.LastCatchTime < conf.CatchTimeIntervel {
-			return 0, types.Error_Trans_CatchIntervel
+			err = types.Error_Trans_CatchIntervel
+			return
 		}
-		balance, err := trans.GetBalance(mPlay.PubPublic)
-		if err != nil {
-			return 0, err
+		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
+			return
 		}
-		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Catch].Amount, balance)
-		if err != nil {
-			return 0, err
+		if result, err = compareAmount(conf.GetMapType()[types.Trans_Type_Catch].Amount, balance); err != nil {
+			return
 		}
 		if result > 0 {
-			return 0, types.Error_Trans_AmountOver
+			err = types.Error_Trans_AmountOver
+			return
 		}
-
 		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Catch].Amount); err != nil {
-			return 0, err
+			return
 		}
-
-		UpCatchTime(uid)
 
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		return t.InsertTransQ(uid, pid, types.Trans_Type_Catch, conf.GetMapType()[types.Trans_Type_Catch].Amount,
+		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Catch, conf.GetMapType()[types.Trans_Type_Catch].Amount,
 			conf.GetMapType()[types.Trans_Type_Catch].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Catch].Name)
+		return
 
 	case types.Trans_Type_Train: //训练
-		balance, err := trans.GetBalance(mPlay.PubPublic)
-		if err != nil {
-			return 0, err
+		var (
+			mPet   *models.Pet
+			result int
+		)
+		if mPet, err = models.GetPetById(pid); err != nil {
+			return
 		}
-		result, err := compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, balance)
-		if err != nil {
-			return 0, err
+		if result, err = compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, mPet.TrainTotle); err != nil {
+			return
 		}
 		if result > 0 {
-			return 0, types.Error_Trans_AmountOver
+			return "", types.Error_Trans_AmountOver
 		}
 		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Train].Amount); err != nil {
-			return 0, err
+			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		return t.InsertTransQ(uid, pid, types.Trans_Type_Train, conf.GetMapType()[types.Trans_Type_Train].Amount,
+		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Train, conf.GetMapType()[types.Trans_Type_Train].Amount,
 			conf.GetMapType()[types.Trans_Type_Train].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Train].Name)
+		return
 
 	case types.Trans_Type_Bonus: //分红
 		if txhash, err = trans.DoTransaction("SB7XB25ZIZB3XCNUXFY64NNIY5WNWPVCMBOLKPPMWWADHKUBM4HZOXVO", mPlay.PubPublic, amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		return t.InsertTransQ(uid, pid, types.Trans_Type_Bonus, amount,
+		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Bonus, amount,
 			conf.GetMapType()[types.Trans_Type_Bonus].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Bonus].Name)
+		return
 
 	}
-	return 0, types.Error_Trans_MisType
+	return "", types.Error_Trans_MisType
 
 }
 

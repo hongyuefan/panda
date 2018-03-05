@@ -182,3 +182,10 @@ func (o *OpChain) QueryTransaction(txhash string) (result int, err error) {
 	}
 	return 1, nil
 }
+
+func (o *OpChain) ValidatePublicKey(publickey string) (err error) {
+	if len(publickey) < 32 {
+		return fmt.Errorf("wallet is not right")
+	}
+	return
+}

@@ -11,6 +11,7 @@ type Attribute struct {
 	Attrname string `orm:"column(attrname);size(32);null"`
 	Normal   string `orm:"column(normal);size(32);null"`
 	Special  string `orm:"column(special);size(32)"`
+	Limit    string `orm:"column(limit);size(64)"`
 }
 
 func (t *Attribute) TableName() string {
