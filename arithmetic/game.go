@@ -72,3 +72,25 @@ func CatchCold(ratio float64, catchTime float64, ctimes int, years float64, zhil
 
 	return
 }
+
+func Benefit(zhili, liliang, trainTotal string, rare float64, years float64) (amount_ration int64, err error) {
+
+	fzl, err := strconv.ParseFloat(zhili, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	fll, err := strconv.ParseFloat(liliang, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	ftrain, err := strconv.ParseFloat(trainTotal, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	amount_ration = int64(fzl * fll * (1 + rare) * ftrain / (1 + years/10))
+
+	return
+}

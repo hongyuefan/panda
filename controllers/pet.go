@@ -66,7 +66,6 @@ func (t *PetController) HandlerGetPets() {
 		page, perpage                   int64
 		query                           map[string]string
 		ml                              []interface{}
-		count                           int
 		arryPets                        []types.GetPet
 		onePet                          types.GetPet
 	)
@@ -120,12 +119,12 @@ func (t *PetController) HandlerGetPets() {
 		onePet.TrainTotal = v.(models.Pet).TrainTotle
 		onePet.LastCatchTime = v.(models.Pet).LastCatchTime
 		onePet.CatchTimes = v.(models.Pet).CatchTimes
+		onePet.IsRare = v.(models.Pet).IsRare
 
 		arryPets = append(arryPets, onePet)
 
-		count++
 	}
-	t.HandlerResult(count, arryPets)
+	t.HandlerResult(len(ml), arryPets)
 	return
 errDeal:
 	ErrorHandler(t.Ctx, err)

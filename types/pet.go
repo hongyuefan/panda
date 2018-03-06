@@ -13,6 +13,7 @@ type GetPet struct {
 	LastCatchTime int64  `json:"last_catch_time"`
 	CreateTime    int64  `json:"birth"`
 	CatchTimes    int    `json:"catch_times"`
+	IsRare        int    `json:"rare"`
 }
 type RspGetPets struct {
 	Total int      `json:"total"`

@@ -24,6 +24,8 @@ type Pet struct {
 	LastCatchTime int64  `orm:"column(lastcatchtime)"`
 	CreatTime     int64  `orm:"column(createtime)"`
 	CatchTimes    int    `orm:"column(catch_times)"`
+	IsRare        int    `orm:"column(is_rare)"`
+	Intrest       int64  `orm:"column(intrest)"`
 }
 
 func (t *Pet) TableName() string {
@@ -38,8 +40,26 @@ func init() {
 // last inserted Id on success.
 func AddPet(m *Pet) (id int64, err error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
-	return
+	return o.Insert(m)
+}
+
+func GetIntrest(pid int64) (intrest int64, err error) {
+	o := orm.NewOrm()
+	v := &Pet{Id: pid}
+	if err = o.Read(v, "Intrest"); err != nil {
+		return
+	}
+	return v.Intrest, nil
+
+}
+
+func SetIntrest(pid, intrest int64) (int64, error) {
+	o := orm.NewOrm()
+	v := &Pet{
+		Id:      pid,
+		Intrest: intrest,
+	}
+	return o.Update(v, "Intrest")
 }
 
 // GetPetById retrieves Pet by Id. Returns error if

@@ -139,6 +139,10 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 
 }
 
+func (t *TransactionContoller) Bonus() {
+
+}
+
 func (t *TransactionContoller) InsertTransQ(uid, pid, ntype int64, amount, fee, txhash, stype string) (tid int64, err error) {
 
 	transQ := &models.TransQ{

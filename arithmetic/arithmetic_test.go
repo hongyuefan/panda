@@ -69,3 +69,12 @@ func TestCatchCold(t *testing.T) {
 
 	return
 }
+
+func TestBenefit(t *testing.T) {
+	zl, err := Benefit("1.2", "1.4", "50", 0.5, 1)
+	if err != nil {
+		panic(err)
+	}
+	t.Log(zl)
+	return
+}

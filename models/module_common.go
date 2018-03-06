@@ -29,7 +29,6 @@ func (c *Common) CommonGetFilterAll(table string, filter map[string]interface{},
 	for k, v := range filter {
 		qs = qs.Filter(k, v)
 	}
-
 	return qs.All(arryData)
 }
 

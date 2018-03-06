@@ -246,7 +246,6 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 	}
 	if result != 0 {
 		//TODO:生成svg文件，返回路径
-		fmt.Println(result)
 
 		pet := &models.Pet{
 			Uid:           uid,
@@ -260,6 +259,7 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 			LastCatchTime: time.Now().Unix(),
 			CreatTime:     time.Now().Unix(),
 			CatchTimes:    0,
+			IsRare:        result,
 		}
 
 		if petId, err = models.AddPet(pet); err != nil {

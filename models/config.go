@@ -12,6 +12,7 @@ type Config struct {
 	TrainLimit        int64   `orm:"column(train_limit)"`
 	JudgeTime         int     `orm:"column(judge_time_sleep)"`
 	CatchRation       float64 `orm:"column(catch_ration)"`
+	RareAttribute     float64 `orm:"column(rare_attribute)"`
 	ownerPrv          string
 	maptsType         map[int64]*TransType
 	mapattrType       map[int64]*Attribute
