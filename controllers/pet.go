@@ -14,6 +14,50 @@ type PetController struct {
 	beego.Controller
 }
 
+func (t *PetController) HandlerGetPetAttribute() {
+	var (
+		err        error
+		spetId     string
+		petId      int64
+		conf       models.Config
+		petAttr    types.RspGetPetAttr
+		attrValues []types.GetPetAttr
+		attrValue  types.GetPetAttr
+
+		atv *models.Attrvalue
+	)
+	if err = t.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	spetId = t.Ctx.Request.FormValue("petId")
+
+	if petId, err = strconv.ParseInt(spetId, 10, 64); err != nil {
+		goto errDeal
+	}
+	conf = GetConfigData()
+
+	for _, v := range conf.GetMapAttr() {
+		if atv, err = models.GetAttrvalue(petId, v.Id); err != nil {
+			goto errDeal
+		}
+		attrValue.Name = v.Attrname
+		attrValue.Value = atv.Value
+
+		attrValues = append(attrValues, attrValue)
+	}
+
+	petAttr.Uid = fmt.Sprintf("%v", atv.Uid)
+	petAttr.Pid = fmt.Sprintf("%v", atv.Pid)
+	petAttr.Years = atv.Years
+	petAttr.Attrs = attrValues
+	t.Ctx.Output.JSON(petAttr, false, false)
+	return
+errDeal:
+	ErrorHandler(t.Ctx, err)
+	return
+}
+
 func (t *PetController) HandlerGetPets() {
 	var (
 		err                             error
@@ -73,6 +117,9 @@ func (t *PetController) HandlerGetPets() {
 		onePet.PetName = fmt.Sprintf("%v", v.(models.Pet).Petname)
 		onePet.Status = v.(models.Pet).Status
 		onePet.Years = v.(models.Pet).Years
+		onePet.TrainTotal = v.(models.Pet).TrainTotle
+		onePet.LastCatchTime = v.(models.Pet).LastCatchTime
+		onePet.CatchTimes = v.(models.Pet).CatchTimes
 
 		arryPets = append(arryPets, onePet)
 

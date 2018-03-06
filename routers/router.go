@@ -34,6 +34,7 @@ func init() {
 	beego.Router("/v1/tsxm/setwallet", &controllers.WalletController{}, "get:SetWalletAddress")
 	beego.Router("/v1/tsxm/trainpet", &controllers.TrainController{}, "get:HandlerTrainPet")
 	beego.Router("/v1/tsxm/getPets", &controllers.PetController{}, "get:HandlerGetPets")
+	beego.Router("/v1/tsxm/getPetAttribute", &controllers.PetController{}, "get:HandlerGetPetAttribute")
 
 	//	ns := beego.NewNamespace("/v1",
 

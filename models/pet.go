@@ -23,6 +23,7 @@ type Pet struct {
 	TrainTotle    string `orm:"column(train_totle);size(128)"`
 	LastCatchTime int64  `orm:"column(lastcatchtime)"`
 	CreatTime     int64  `orm:"column(createtime)"`
+	CatchTimes    int    `orm:"column(catch_times)"`
 }
 
 func (t *Pet) TableName() string {
@@ -166,8 +167,9 @@ func UpCatchTime(pid int64) (err error) {
 		return
 	}
 	pet.LastCatchTime = time.Now().Unix()
+	pet.CatchTimes += 1
 
-	if err = UpdatePetById(pet, "LastCatchTime"); err != nil {
+	if err = UpdatePetById(pet, "LastCatchTime", "CatchTimes"); err != nil {
 		return
 	}
 	return

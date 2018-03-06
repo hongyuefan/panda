@@ -37,6 +37,21 @@ func NewAttrvalue(pid, uid, aid int64, years int, value string) *Attrvalue {
 	}
 }
 
+func GetAttrvalue(pid int64, aid int64) (v *Attrvalue, err error) {
+
+	o := orm.NewOrm()
+
+	v = &Attrvalue{
+		Pid: pid,
+		Aid: aid,
+	}
+
+	if err = o.Read(v, "pid", "aid"); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
 // AddAttrvalue insert a new Attrvalue into database and returns
 // last inserted Id on success.
 func AddAttrvalue(m *Attrvalue) (id int64, err error) {

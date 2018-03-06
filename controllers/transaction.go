@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"panda/arithmetic"
 	"panda/models"
 	trans "panda/transaction"
 	"panda/types"
@@ -56,18 +57,30 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 
 	case types.Trans_Type_Catch: //捕捉
 		var (
-			balance string
-			mPet    *models.Pet
-			result  int
+			balance  string
+			mPet     *models.Pet
+			result   int
+			coldTime float64
+			attr     *models.Attrvalue
 		)
 
 		if mPet, err = models.GetPetById(pid); err != nil {
 			return
 		}
-		if time.Now().Unix()-mPet.LastCatchTime < conf.CatchTimeIntervel {
-			err = types.Error_Trans_CatchIntervel
+		if attr, err = models.GetAttrvalue(pid, types.Attr_Type_Zhili); err != nil {
 			return
 		}
+
+		if coldTime, err = arithmetic.CatchCold(conf.CatchRation, float64(conf.CatchTimeIntervel), mPet.CatchTimes, float64(mPet.Years), attr.Value); err != nil {
+			return
+		}
+
+		coldIntervel := int64(coldTime) - (time.Now().Unix() - mPet.LastCatchTime)
+
+		if coldIntervel > 0 {
+			return "", fmt.Errorf("距离下次捕捉时间还有 %v 分钟", coldIntervel/60)
+		}
+
 		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
 			return
 		}

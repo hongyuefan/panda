@@ -32,6 +32,7 @@ func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType, mat map
 	configData.JudgeTime = conf.JudgeTime
 	configData.CatchTimeIntervel = conf.CatchTimeIntervel
 	configData.TrainLimit = conf.TrainLimit
+	configData.CatchRation = conf.CatchRation
 	configData.SetMapType(mtx)
 	configData.SetMapAttr(mat)
 }

@@ -259,6 +259,7 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 			TrainTotle:    "0",
 			LastCatchTime: time.Now().Unix(),
 			CreatTime:     time.Now().Unix(),
+			CatchTimes:    0,
 		}
 
 		if petId, err = models.AddPet(pet); err != nil {

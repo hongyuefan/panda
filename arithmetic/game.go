@@ -1,6 +1,7 @@
 package arithmetic
 
 import (
+	"strconv"
 	"strings"
 	"time"
 )
@@ -57,5 +58,17 @@ func TrainResult(hash string, N int) (statue int, err error) {
 		statue = 1
 		return
 	}
+	return
+}
+
+func CatchCold(ratio float64, catchTime float64, ctimes int, years float64, zhili string) (coldTm float64, err error) {
+
+	fzl, err := strconv.ParseFloat(zhili, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	coldTm = catchTime * Powerf(ratio, ctimes) * ((1 + years) * 7 / 10) / (1 + (fzl*fzl)/10)
+
 	return
 }

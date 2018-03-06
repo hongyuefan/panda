@@ -59,3 +59,13 @@ func TestCatchResult(t *testing.T) {
 	t.Log(result)
 	return
 }
+
+func TestCatchCold(t *testing.T) {
+	zl, err := CatchCold(1.42, 30, 3, 0, "1.2")
+	if err != nil {
+		panic(err)
+	}
+	t.Log(zl)
+
+	return
+}
