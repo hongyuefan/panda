@@ -303,30 +303,6 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["panda/controllers:PetController"] = append(beego.GlobalControllerRouter["panda/controllers:PetController"],
-		beego.ControllerComments{
-			Method: "Post",
-			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:PetController"] = append(beego.GlobalControllerRouter["panda/controllers:PetController"],
-		beego.ControllerComments{
-			Method: "GetAll",
-			Router: `/`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["panda/controllers:PetController"] = append(beego.GlobalControllerRouter["panda/controllers:PetController"],
-		beego.ControllerComments{
-			Method: "GetOne",
-			Router: `/:id`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
 	beego.GlobalControllerRouter["panda/controllers:PlayerController"] = append(beego.GlobalControllerRouter["panda/controllers:PlayerController"],
 		beego.ControllerComments{
 			Method: "Post",

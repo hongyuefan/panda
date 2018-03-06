@@ -34,79 +34,79 @@ func init() {
 	beego.Router("/v1/tsxm/setwallet", &controllers.WalletController{}, "get:SetWalletAddress")
 	beego.Router("/v1/tsxm/trainpet", &controllers.TrainController{}, "get:HandlerTrainPet")
 
-	ns := beego.NewNamespace("/v1",
+	//	ns := beego.NewNamespace("/v1",
 
-		beego.NSNamespace("/income",
-			beego.NSInclude(
-				&controllers.IncomeController{},
-			),
-		),
+	//		beego.NSNamespace("/income",
+	//			beego.NSInclude(
+	//				&controllers.IncomeController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/attribute",
-			beego.NSInclude(
-				&controllers.AttributeController{},
-			),
-		),
+	//		beego.NSNamespace("/attribute",
+	//			beego.NSInclude(
+	//				&controllers.AttributeController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/order",
-			beego.NSInclude(
-				&controllers.OrderController{},
-			),
-		),
+	//		beego.NSNamespace("/order",
+	//			beego.NSInclude(
+	//				&controllers.OrderController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/pet",
-			beego.NSInclude(
-				&controllers.PetController{},
-			),
-		),
+	//		beego.NSNamespace("/pet",
+	//			beego.NSInclude(
+	//				&controllers.PetController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/trade",
-			beego.NSInclude(
-				&controllers.TradeController{},
-			),
-		),
+	//		beego.NSNamespace("/trade",
+	//			beego.NSInclude(
+	//				&controllers.TradeController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/incometype",
-			beego.NSInclude(
-				&controllers.IncometypeController{},
-			),
-		),
+	//		beego.NSNamespace("/incometype",
+	//			beego.NSInclude(
+	//				&controllers.IncometypeController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/catch",
-			beego.NSInclude(
-				&controllers.CatchController{},
-			),
-		),
+	//		beego.NSNamespace("/catch",
+	//			beego.NSInclude(
+	//				&controllers.CatchController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/feedeffect",
-			beego.NSInclude(
-				&controllers.FeedeffectController{},
-			),
-		),
+	//		beego.NSNamespace("/feedeffect",
+	//			beego.NSInclude(
+	//				&controllers.FeedeffectController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/ordereffect",
-			beego.NSInclude(
-				&controllers.OrdereffectController{},
-			),
-		),
+	//		beego.NSNamespace("/ordereffect",
+	//			beego.NSInclude(
+	//				&controllers.OrdereffectController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/player",
-			beego.NSInclude(
-				&controllers.PlayerController{},
-			),
-		),
+	//		beego.NSNamespace("/player",
+	//			beego.NSInclude(
+	//				&controllers.PlayerController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/transaccount",
-			beego.NSInclude(
-				&controllers.TransaccountController{},
-			),
-		),
+	//		beego.NSNamespace("/transaccount",
+	//			beego.NSInclude(
+	//				&controllers.TransaccountController{},
+	//			),
+	//		),
 
-		beego.NSNamespace("/attrvalue",
-			beego.NSInclude(
-				&controllers.AttrvalueController{},
-			),
-		),
-	)
-	beego.AddNamespace(ns)
+	//		beego.NSNamespace("/attrvalue",
+	//			beego.NSInclude(
+	//				&controllers.AttrvalueController{},
+	//			),
+	//		),
+	//	)
+	//	beego.AddNamespace(ns)
 }
