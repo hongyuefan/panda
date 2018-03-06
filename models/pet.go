@@ -22,6 +22,7 @@ type Pet struct {
 	SvgPath       string `orm:"column(svg_path);size(256)"`
 	TrainTotle    string `orm:"column(train_totle);size(128)"`
 	LastCatchTime int64  `orm:"column(lastcatchtime)"`
+	CreatTime     int64  `orm:"column(createtime)"`
 }
 
 func (t *Pet) TableName() string {

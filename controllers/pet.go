@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"panda/models"
+	"panda/types"
 	"strconv"
 
 	"github.com/astaxie/beego"
@@ -21,6 +22,9 @@ func (t *PetController) HandlerGetPets() {
 		page, perpage                   int64
 		query                           map[string]string
 		ml                              []interface{}
+		count                           int
+		arryPets                        []types.GetPet
+		onePet                          types.GetPet
 	)
 	if err = t.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -50,7 +54,7 @@ func (t *PetController) HandlerGetPets() {
 		query["uid"] = sUid
 	}
 	if sPid != "" {
-		query["pid"] = sPid
+		query["id"] = sPid
 	}
 	if sstatus != "" {
 		query["status"] = sstatus
@@ -59,8 +63,32 @@ func (t *PetController) HandlerGetPets() {
 	if ml, err = models.GetAllPet(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
 		goto errDeal
 	}
-	fmt.Println(ml)
+	for _, v := range ml {
+		onePet.Uid = fmt.Sprintf("%v", v.(models.Pet).Uid)
+		onePet.Pid = fmt.Sprintf("%v", v.(models.Pet).Id)
+		onePet.Cid = fmt.Sprintf("%v", v.(models.Pet).Cid)
+		onePet.CreateTime = v.(models.Pet).CreatTime
+		onePet.Fid = fmt.Sprintf("%v", v.(models.Pet).Fid)
+		onePet.Imag = fmt.Sprintf("%v", v.(models.Pet).SvgPath)
+		onePet.PetName = fmt.Sprintf("%v", v.(models.Pet).Petname)
+		onePet.Status = v.(models.Pet).Status
+		onePet.Years = v.(models.Pet).Years
+
+		arryPets = append(arryPets, onePet)
+
+		count++
+	}
+	t.HandlerResult(count, arryPets)
 	return
 errDeal:
+	ErrorHandler(t.Ctx, err)
 	return
+}
+
+func (t *PetController) HandlerResult(total int, datas []types.GetPet) {
+	t.Ctx.Output.JSON(
+		types.RspGetPets{
+			Total: total,
+			Pets:  datas,
+		}, false, false)
 }
