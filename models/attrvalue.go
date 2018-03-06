@@ -16,6 +16,7 @@ type Attrvalue struct {
 	Aid   int64  `orm:"column(aid)"`
 	Years int    `orm:"column(years)"`
 	Value string `orm:"column(value);size(64);null"`
+	Multi string `orm:"column(multi);size(32)"`
 }
 
 func (t *Attrvalue) TableName() string {

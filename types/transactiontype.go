@@ -36,6 +36,8 @@ var (
 	Error_Trans_AmountOver    = fmt.Errorf("转账数值大于账户总额")
 	Error_Trans_MisType       = fmt.Errorf("转账类型不匹配")
 	Error_Trans_CatchIntervel = fmt.Errorf("捕捉冷却时间不足")
+
+	Error_Train_AmountOver = fmt.Errorf("训练额度大于当日最大限度")
 )
 
 type TransQData struct {

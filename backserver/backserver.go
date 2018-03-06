@@ -89,7 +89,7 @@ func (s *BackServer) JudgeResult(itype int64, txhash, amount string, txid, uid, 
 	switch itype {
 	case types.Trans_Type_Catch:
 
-		if err := models.UpCatchTime(uid); err != nil {
+		if err := models.UpCatchTime(pid); err != nil {
 			beego.BeeLogger.Error("UpCatchTime error %v,txhash %v Uid %v ", err, txhash, uid)
 		}
 		s.CatchResult(txhash, txid, uid, pid)
@@ -136,15 +136,15 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 		return
 	}
 
-	mjAttr.Value, err = s.trainArithmetic(types.Attr_Type_Minjie, st1, mjAttr.Value, amount)
+	mjAttr.Value, mjAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Minjie, st1, mjAttr.Value, amount)
 	if err != nil {
 		return
 	}
-	llAttr.Value, err = s.trainArithmetic(types.Attr_Type_Liliang, st2, llAttr.Value, amount)
+	llAttr.Value, llAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Liliang, st2, llAttr.Value, amount)
 	if err != nil {
 		return
 	}
-	zlAttr.Value, err = s.trainArithmetic(types.Attr_Type_Zhili, st3, zlAttr.Value, amount)
+	zlAttr.Value, zlAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Zhili, st3, zlAttr.Value, amount)
 	if err != nil {
 		return
 	}
@@ -155,8 +155,8 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 }
 
 func (s *BackServer) upDateAttrValue(attr *models.Attrvalue) (err error) {
-	if _, err = s.com.CommonUpdateById(attr, "value"); err != nil {
-		beego.BeeLogger.Error("upDateAttrValue error:%v, attrId:%v value:%v", err, attr.Id, attr.Value)
+	if _, err = s.com.CommonUpdateById(attr, "value", "multi"); err != nil {
+		beego.BeeLogger.Error("upDateAttrValue error:%v, attrId:%v value:%v multi:%v", err, attr.Id, attr.Value, attr.Multi)
 	}
 	return
 }
@@ -174,14 +174,14 @@ func (s *BackServer) getAttr(uid, pid, aid int64) (attr *models.Attrvalue, err e
 	return
 }
 
-func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount string) (result string, err error) {
+func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount string) (result, strMulti string, err error) {
 	var (
-		strMulti string = "1"
 		nMulti   float64
 		nBalance float64
 		nResult  float64
 		nAmount  float64
 	)
+	strMulti = "1"
 
 	if state == 1 {
 		strMulti = s.conf.GetMapAttr()[ntype].Normal
@@ -214,6 +214,7 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 		err                       error
 		result                    int
 		mjValue, llValue, zlValue float64
+		petId                     int64
 	)
 	attr := &models.Attrvalue{
 		Uid: uid,
@@ -248,16 +249,18 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 		fmt.Println(result)
 
 		pet := &models.Pet{
-			Uid:     uid,
-			Cid:     cid,
-			Fid:     pid,
-			Petname: txhash,
-			Years:   attr.Years + 1,
-			SvgPath: "svgpath",
-			Status:  0,
+			Uid:           uid,
+			Cid:           cid,
+			Fid:           pid,
+			Petname:       txhash,
+			Years:         attr.Years + 1,
+			SvgPath:       "svgpath",
+			Status:        0,
+			TrainTotle:    "0",
+			LastCatchTime: time.Now().Unix(),
 		}
 
-		if _, err = models.AddPet(pet); err != nil {
+		if petId, err = models.AddPet(pet); err != nil {
 			beego.BeeLogger.Info("CatchResult AddPet Error %v need operation manual:Uid %v,Cid %v,Fid %v,Petnam %v,years %v,svgpath %v",
 				err, uid, cid, pid, txhash, attr.Years+1, "svgpath")
 			return
@@ -268,25 +271,25 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 			return
 		}
 
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(pid, uid, types.Attr_Type_Minjie, attr.Years+1, fmt.Sprintf("%v", mjValue))); err != nil {
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Minjie, attr.Years+1, fmt.Sprintf("%v", mjValue))); err != nil {
 			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
-				err, types.Attr_Type_Minjie, uid, cid, pid, txhash, attr.Years+1)
+				err, types.Attr_Type_Minjie, uid, cid, petId, txhash, attr.Years+1)
 			return
 		}
 		if llValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Liliang].Limit); err != nil {
 			beego.BeeLogger.Error("CatchResult RandValue Error %v", err)
 			return
 		}
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(pid, uid, types.Attr_Type_Liliang, attr.Years+1, fmt.Sprintf("%v", llValue))); err != nil {
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Liliang, attr.Years+1, fmt.Sprintf("%v", llValue))); err != nil {
 			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
-				err, types.Attr_Type_Liliang, uid, cid, pid, txhash, attr.Years+1)
+				err, types.Attr_Type_Liliang, uid, cid, petId, txhash, attr.Years+1)
 			return
 		}
 		if zlValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Zhili].Limit); err != nil {
 			beego.BeeLogger.Error("CatchResult RandValue Error %v", err)
 			return
 		}
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(pid, uid, types.Attr_Type_Zhili, attr.Years+1, fmt.Sprintf("%v", zlValue))); err != nil {
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Zhili, attr.Years+1, fmt.Sprintf("%v", zlValue))); err != nil {
 			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
 				err, types.Attr_Type_Zhili, uid, cid, pid, txhash, attr.Years+1)
 			return

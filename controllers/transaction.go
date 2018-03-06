@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"panda/models"
 	trans "panda/transaction"
 	"panda/types"
@@ -56,9 +57,14 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 	case types.Trans_Type_Catch: //捕捉
 		var (
 			balance string
+			mPet    *models.Pet
 			result  int
 		)
-		if time.Now().Unix()-mPlay.LastCatchTime < conf.CatchTimeIntervel {
+
+		if mPet, err = models.GetPetById(pid); err != nil {
+			return
+		}
+		if time.Now().Unix()-mPet.LastCatchTime < conf.CatchTimeIntervel {
 			err = types.Error_Trans_CatchIntervel
 			return
 		}
@@ -90,17 +96,17 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 		if mPet, err = models.GetPetById(pid); err != nil {
 			return
 		}
-		if result, err = compareAmount(conf.GetMapType()[types.Trans_Type_Train].Amount, mPet.TrainTotle); err != nil {
+		if result, err = compareAmount(mPet.TrainTotle, fmt.Sprintf("%v", conf.TrainLimit)); err != nil {
 			return
 		}
 		if result > 0 {
-			return "", types.Error_Trans_AmountOver
+			return "", types.Error_Train_AmountOver
 		}
-		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Train].Amount); err != nil {
+		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Train, conf.GetMapType()[types.Trans_Type_Train].Amount,
+		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Train, amount,
 			conf.GetMapType()[types.Trans_Type_Train].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Train].Name)
 		return

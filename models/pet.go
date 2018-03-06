@@ -6,20 +6,22 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 )
 
 type Pet struct {
-	Id         int64  `orm:"column(id);auto" description:"自增"`
-	Petname    string `orm:"column(petname);size(64);null" description:"宠物名称"`
-	Years      int    `orm:"column(years)" description:"第几代"`
-	Uid        int64  `orm:"column(uid)" description:"用户ID"`
-	Cid        int64  `orm:"column(cid)"`
-	Fid        int64  `orm:"column(fid)"`
-	Status     int    `orm:"column(status)"`
-	SvgPath    string `orm:"column(svg_path);size(256)"`
-	TrainTotle string `orm:"column(train_totle);size(128)"`
+	Id            int64  `orm:"column(id);auto" description:"自增"`
+	Petname       string `orm:"column(petname);size(64);null" description:"宠物名称"`
+	Years         int    `orm:"column(years)" description:"第几代"`
+	Uid           int64  `orm:"column(uid)" description:"用户ID"`
+	Cid           int64  `orm:"column(cid)"`
+	Fid           int64  `orm:"column(fid)"`
+	Status        int    `orm:"column(status)"`
+	SvgPath       string `orm:"column(svg_path);size(256)"`
+	TrainTotle    string `orm:"column(train_totle);size(128)"`
+	LastCatchTime int64  `orm:"column(lastcatchtime)"`
 }
 
 func (t *Pet) TableName() string {
@@ -153,6 +155,19 @@ func DeletePet(id int64) (err error) {
 		if num, err = o.Delete(&Pet{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
+	}
+	return
+}
+
+func UpCatchTime(pid int64) (err error) {
+	var pet *Pet
+	if pet, err = GetPetById(pid); err != nil {
+		return
+	}
+	pet.LastCatchTime = time.Now().Unix()
+
+	if err = UpdatePetById(pet, "LastCatchTime"); err != nil {
+		return
 	}
 	return
 }
