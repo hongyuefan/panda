@@ -30,9 +30,9 @@ func generate_rand(number int64) (nRand int64) {
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
 
-	path := generate_svg(1, "c://", "1")
+	path := generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
 
-	c.Ctx.Output.JSON(path, false, false)
+	c.Ctx.Output.JSON("http://47.92.67.93:8080/svg/"+path+".svg", false, false)
 }
 
 /*generate svg file*/

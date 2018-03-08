@@ -18,5 +18,8 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
+
+	beego.SetStaticPath("/svg", "svgfile")
+
 	beego.Run(":8080")
 }
