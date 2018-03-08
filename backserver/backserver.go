@@ -96,9 +96,6 @@ func (s *BackServer) JudgeResult(itype int64, txhash, amount string, txid, uid, 
 
 	case types.Trans_Type_Train:
 
-		if err := models.UpTrainTotle(pid, amount); err != nil {
-			beego.BeeLogger.Error("UpTrainTotle error %v,txhash %v Uid %v Amount %v", err, txhash, uid, amount)
-		}
 		s.TrainResult(txhash, amount, txid, uid, pid)
 	}
 }
@@ -151,6 +148,10 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 	s.upDateAttrValue(mjAttr)
 	s.upDateAttrValue(llAttr)
 	s.upDateAttrValue(zlAttr)
+
+	if err := models.UpTrainTotleAndIntrest(pid, amount, zlAttr.Value, llAttr.Value, s.conf.RareAttribute); err != nil {
+		beego.BeeLogger.Error("UpTrainTotle error %v,txhash %v Uid %v Amount %v", err, txhash, uid, amount)
+	}
 	return
 }
 

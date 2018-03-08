@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"panda/arithmetic"
 	"reflect"
 	"strconv"
 	"strings"
@@ -195,7 +196,7 @@ func UpCatchTime(pid int64) (err error) {
 	return
 }
 
-func UpTrainTotle(pid int64, addAmount string) (err error) {
+func UpTrainTotleAndIntrest(pid int64, addAmount, zhili, liliang string, rare float64) (err error) {
 
 	pet, err := GetPetById(pid)
 	if err != nil {
@@ -213,7 +214,13 @@ func UpTrainTotle(pid int64, addAmount string) (err error) {
 
 	Totle := nTotle + nAmount
 
+	if pet.IsRare != 2 {
+		rare = 0
+	}
+
+	pet.Intrest, err = arithmetic.Benefit(zhili, liliang, float64(Totle), rare, float64(pet.Years))
+
 	pet.TrainTotle = fmt.Sprintf("%v", Totle)
 
-	return UpdatePetById(pet, "TrainTotle")
+	return UpdatePetById(pet, "TrainTotle", "Intrest")
 }

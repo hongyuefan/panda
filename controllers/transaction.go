@@ -77,8 +77,9 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 
 		coldIntervel := int64(coldTime) - (time.Now().Unix() - mPet.LastCatchTime)
 
+		h, m, s := arithmetic.ParseSecond(coldIntervel)
 		if coldIntervel > 0 {
-			return "", fmt.Errorf("距离下次捕捉时间还有 %v 分钟", coldIntervel/60)
+			return "", fmt.Errorf("距离下次捕捉时间还有 %v 小时 %v 分钟 %v 秒", h, m, s)
 		}
 
 		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
@@ -139,8 +140,35 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 
 }
 
+func (t *TransactionContoller) CountAllIntrest() (totle int64, err error) {
+
+	var (
+		offset int64 = 0
+		limit  int64 = 100
+	)
+
+	query := make(map[string]string)
+
+	for {
+		ml, err := models.GetAllPet(query, []string{"Intrest"}, []string{"id"}, []string{"asc"}, offset, limit)
+		if err != nil {
+			return 0, err
+		}
+		if len(ml) <= 0 {
+			break
+		}
+		for _, v := range ml {
+			totle += v.(map[string]interface{})["Intrest"].(int64)
+		}
+		offset = +int64(len(ml))
+	}
+	return
+
+}
+
 func (t *TransactionContoller) Bonus() {
 
+	return
 }
 
 func (t *TransactionContoller) InsertTransQ(uid, pid, ntype int64, amount, fee, txhash, stype string) (tid int64, err error) {

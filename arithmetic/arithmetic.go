@@ -133,3 +133,14 @@ func Powerf(x float64, n int) float64 {
 	}
 	return ans
 }
+
+//秒装换为时分秒
+func ParseSecond(second int64) (hour, min, sec int64) {
+	sec = second % 60
+	min = second / 60
+	if min >= 60 {
+		hour = min / 60
+		min = min % 60
+	}
+	return
+}

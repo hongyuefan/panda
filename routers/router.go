@@ -36,6 +36,8 @@ func init() {
 	beego.Router("/v1/tsxm/getPets", &controllers.PetController{}, "get:HandlerGetPets")
 	beego.Router("/v1/tsxm/getPetAttribute", &controllers.PetController{}, "get:HandlerGetPetAttribute")
 
+	beego.Router("/v1/tsxm/test", &controllers.GeneratesvgfileController{}, "get:HandlerGenerate")
+
 	//	ns := beego.NewNamespace("/v1",
 
 	//		beego.NSNamespace("/income",

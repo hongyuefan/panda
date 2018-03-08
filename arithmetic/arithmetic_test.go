@@ -71,10 +71,17 @@ func TestCatchCold(t *testing.T) {
 }
 
 func TestBenefit(t *testing.T) {
-	zl, err := Benefit("1.2", "1.4", "50", 0.5, 1)
+	zl, err := Benefit("1.2", "1.4", 50, 0.5, 1)
 	if err != nil {
 		panic(err)
 	}
 	t.Log(zl)
+	return
+}
+
+func TestParseSecond(t *testing.T) {
+	h, m, s := ParseSecond(3667)
+
+	t.Log(h, m, s)
 	return
 }
