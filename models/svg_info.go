@@ -17,6 +17,7 @@ type Svg_info struct {
 	Svg_dtl     string `orm:"column(svg_dtl);size(4096)"`
 	N_id        int64  `orm:"column(n_id);"`
 	Base_color  int    `orm:"column(base_color);"`
+	P_id        int64  `orm:"column(p_id);"`
 }
 
 func (t *Svg_info) TableName() string {
@@ -50,6 +51,7 @@ func GetCountByCatagoryId(id int64) (count int64) {
 	qs := o.QueryTable(new(Svg_info))
 
 	qs = qs.Filter("Catagory_id", id)
+	qs = qs.Filter("N_id", 0)
 
 	count, _ = qs.Count()
 

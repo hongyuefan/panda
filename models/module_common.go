@@ -22,6 +22,17 @@ func (c *Common) CommonGetOne(v interface{}, col ...string) (err error) {
 	return
 }
 
+//func (c *Common) CommonGetNo(table interface{}, col string, val interface{},container interface{}) (err error) {
+
+//	qs := c.o.QueryTable(table)
+
+//	cond := orm.NewCondition()
+
+//	cond.AndNot(col, val)
+
+//	qs.SetCond(cond).All()
+//}
+
 func (c *Common) CommonGetFilterAll(table string, filter map[string]interface{}, arryData interface{}) (count int64, err error) {
 
 	qs := c.o.QueryTable(table)

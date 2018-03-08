@@ -29,7 +29,6 @@ func generate_rand(number int64) (nRand int64) {
 }
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
-
 	path := generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
 
 	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
@@ -80,33 +79,51 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 					break
 				}
 
-				fmt.Println("Rand:", rand)
-
 				query := make(map[string]string, 0)
 				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
 				query["base_color"] = fmt.Sprintf("%v", color)
+				query["p_id"] = fmt.Sprintf("%v", 0)
 				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				fmt.Println(len(resultl))
 
 				for _, v := range resultl {
 					svg += v.(models.Svg_info).Svg_dtl
+					// link the next svg to be strcat
+					if v.(models.Svg_info).N_id != 0 {
+						query := make(map[string]string, 0)
+						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+						for _, v := range resultl {
+							svg += v.(models.Svg_info).Svg_dtl
+						}
+					}
 				}
 			} else {
 				// bodyline
 				count := models.GetCountByCatagoryId(catagory_id)
+
 				if count == 0 {
 					break
 				}
 				rand := generate_rand(count)
+
 				query := make(map[string]string, 0)
 				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+				query["p_id"] = fmt.Sprintf("%v", 0)
 				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				fmt.Println(len(resultl))
 
 				for _, v := range resultl {
 					svg += v.(models.Svg_info).Svg_dtl
+					// link the next svg to be strcat
+					if v.(models.Svg_info).N_id != 0 {
+						query := make(map[string]string, 0)
+						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+						for _, v := range resultl {
+							svg += v.(models.Svg_info).Svg_dtl
+						}
+					}
 				}
 			}
 
@@ -114,6 +131,7 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 			//use random element
 			//Be or not be
 			rand := generate_rand(int64(100 / percent))
+
 			if (rand != 0 && percent != 1) || (flag == 1 && percent == 1) {
 				//get count of this item
 				count := models.GetCountByCatagoryId(catagory_id)
@@ -124,9 +142,21 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 				query := make(map[string]string, 0)
 				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+				query["p_id"] = fmt.Sprintf("%v", 0)
 				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
+
 				for _, v := range resultl {
 					svg += v.(models.Svg_info).Svg_dtl
+					// link the next svg to be strcat
+					if v.(models.Svg_info).N_id != 0 {
+						query := make(map[string]string, 0)
+						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+						for _, v := range resultl {
+							svg += v.(models.Svg_info).Svg_dtl
+						}
+					}
 				}
 			}
 
@@ -143,10 +173,21 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 					query := make(map[string]string, 0)
 					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
 					query["base_color"] = fmt.Sprintf("%v", color)
+					query["p_id"] = fmt.Sprintf("%v", 0)
 					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
 
 					for _, v := range resultl {
 						svg += v.(models.Svg_info).Svg_dtl
+						if v.(models.Svg_info).N_id != 0 {
+							// link the next svg to be strcat
+							query := make(map[string]string, 0)
+							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+							for _, v := range resultl {
+								svg += v.(models.Svg_info).Svg_dtl
+							}
+						}
 					}
 				} else {
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
@@ -156,9 +197,20 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 					query := make(map[string]string, 0)
 					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+					query["p_id"] = fmt.Sprintf("%v", 0)
 					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
 					for _, v := range resultl {
 						svg += v.(models.Svg_info).Svg_dtl
+						// link the next svg to be strcat
+						if v.(models.Svg_info).N_id != 0 {
+							query := make(map[string]string, 0)
+							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+							for _, v := range resultl {
+								svg += v.(models.Svg_info).Svg_dtl
+							}
+						}
 					}
 				}
 			} else {
