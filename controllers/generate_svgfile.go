@@ -32,7 +32,7 @@ func (c *GeneratesvgfileController) HandlerGenerate() {
 
 	path := generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
 
-	c.Ctx.Output.JSON("http://47.92.67.93:8080/svg/"+path+".svg", false, false)
+	c.Ctx.Output.JSON("http://47.92.67.93:8080/svg/"+path, false, false)
 }
 
 /*generate svg file*/
@@ -186,5 +186,5 @@ func generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	f.Close()
 
-	return strFile
+	return fileName
 }
