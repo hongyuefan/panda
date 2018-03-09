@@ -25,10 +25,6 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 
 	conf = GetConfigData()
 
-	if mPlay, err = models.GetPlayerById(uid); err != nil {
-		return
-	}
-
 	switch ntype {
 
 	case types.Trans_Type_WithDrawal: //提现
@@ -36,6 +32,9 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			result  int
 			balance string
 		)
+		if mPlay, err = models.GetPlayerById(uid); err != nil {
+			return
+		}
 		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
 			return
 		}
@@ -63,7 +62,9 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			coldTime float64
 			attr     *models.Attrvalue
 		)
-
+		if mPlay, err = models.GetPlayerById(uid); err != nil {
+			return
+		}
 		if mPet, err = models.GetPetById(pid); err != nil {
 			return
 		}
@@ -107,6 +108,9 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			mPet   *models.Pet
 			result int
 		)
+		if mPlay, err = models.GetPlayerById(uid); err != nil {
+			return
+		}
 		if mPet, err = models.GetPetById(pid); err != nil {
 			return
 		}
@@ -126,13 +130,11 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 		return
 
 	case types.Trans_Type_Bonus: //分红
-		if txhash, err = trans.DoTransaction("SB7XB25ZIZB3XCNUXFY64NNIY5WNWPVCMBOLKPPMWWADHKUBM4HZOXVO", mPlay.PubPublic, amount); err != nil {
-			return
-		}
-		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Bonus, amount,
-			conf.GetMapType()[types.Trans_Type_Bonus].Fee, txhash,
-			conf.GetMapType()[types.Trans_Type_Bonus].Name)
+		go func() {
+			if err := t.Bonus(conf); err != nil {
+				beego.BeeLogger.Error("Bonus Error: %v", err)
+			}
+		}()
 		return
 
 	}
@@ -162,11 +164,81 @@ func (t *TransactionContoller) CountAllIntrest() (totle int64, err error) {
 		}
 		offset = +int64(len(ml))
 	}
+	if totle <= 0 {
+		err = fmt.Errorf("CountAllIntrest Totle is Zero")
+	}
 	return
 
 }
 
-func (t *TransactionContoller) Bonus() {
+func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
+	var (
+		offset      int64 = 0
+		limit       int64 = 100
+		totle       int64
+		sbalance    string
+		pub_balance float64
+		txhash      string
+		count       int
+	)
+
+	if sbalance, err = trans.GetBalance(conf.OwnerPub); err != nil {
+		return
+	}
+	if pub_balance, err = strconv.ParseFloat(sbalance, 64); err != nil {
+		return
+	}
+	if totle, err = t.CountAllIntrest(); err != nil {
+		return
+	}
+
+	query := make(map[string]string)
+
+	query["IsBonus"] = "0"
+
+	for {
+		ml, err := models.GetAllPet(query, []string{"Id", "Uid", "Intrest"}, []string{"id"}, []string{"asc"}, offset, limit)
+		if err != nil {
+			continue
+		}
+		if len(ml) <= 0 {
+			break
+		}
+		for _, v := range ml {
+
+			player, err := models.GetPlayerById(v.(map[string]interface{})["Uid"].(int64))
+			if err != nil {
+				continue
+			}
+
+			bunos := float64(v.(map[string]interface{})["Intrest"].(int64)) / float64(totle) * pub_balance * conf.BonusRatio
+			if bunos <= 0 {
+				continue
+			}
+			sBunos := arithmetic.ParseFloat(bunos)
+
+			for {
+
+				if txhash, err = trans.DoTransaction(conf.OwnerPrv, player.PubPublic, sBunos); err == nil {
+					break
+				}
+				count++
+				beego.BeeLogger.Error("Bonus Error %v ,Uid:%v,Pid:%v,Amount:%v,Account:%v", err, v.(map[string]interface{})["Uid"].(int64), v.(map[string]interface{})["Id"].(int64), sBunos, player.PubPublic)
+				if count >= 3 {
+					break
+				}
+			}
+
+			_, err = t.InsertTransQ(v.(map[string]interface{})["Uid"].(int64), v.(map[string]interface{})["Id"].(int64), types.Trans_Type_Bonus, sBunos,
+				conf.GetMapType()[types.Trans_Type_Bonus].Fee, txhash,
+				conf.GetMapType()[types.Trans_Type_Bonus].Name)
+
+			models.UpdateBonusProcess(v.(map[string]interface{})["Id"].(int64))
+		}
+		offset = +int64(len(ml))
+	}
+
+	models.SetBonusOver()
 
 	return
 }

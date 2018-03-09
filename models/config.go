@@ -13,7 +13,9 @@ type Config struct {
 	JudgeTime         int     `orm:"column(judge_time_sleep)"`
 	CatchRation       float64 `orm:"column(catch_ration)"`
 	RareAttribute     float64 `orm:"column(rare_attribute)"`
-	ownerPrv          string
+	HostUrl           string  `orm:"column(host_url)"`
+	BonusRatio        float64 `orm:"column(bonus_ratio)"`
+	OwnerPrv          string  `orm:"column(owner_priv)"`
 	maptsType         map[int64]*TransType
 	mapattrType       map[int64]*Attribute
 }

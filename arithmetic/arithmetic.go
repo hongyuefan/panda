@@ -144,3 +144,12 @@ func ParseSecond(second int64) (hour, min, sec int64) {
 	}
 	return
 }
+
+func ParseFloat(p float64) (result string) {
+
+	i_p := int64(p * 100)
+
+	f_p := float64(i_p) / float64(100)
+
+	return fmt.Sprintf("%v", f_p)
+}

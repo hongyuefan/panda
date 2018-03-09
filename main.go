@@ -4,6 +4,8 @@ import (
 	_ "panda/routers"
 	_ "panda/transaction"
 
+	"panda/types"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -19,7 +21,7 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
-	beego.SetStaticPath("/svg", "svgfile")
+	beego.SetStaticPath(types.Svg_File_Path, beego.AppConfig.String("svg_path"))
 
 	beego.Run(":8080")
 }

@@ -26,6 +26,7 @@ type Pet struct {
 	CreatTime     int64  `orm:"column(createtime)"`
 	CatchTimes    int    `orm:"column(catch_times)"`
 	IsRare        int    `orm:"column(is_rare)"`
+	IsBonus       int    `orm:"column(is_bonus)"`
 	Intrest       int64  `orm:"column(intrest)"`
 }
 
@@ -167,6 +168,29 @@ func UpdatePetById(m *Pet, cols ...string) (err error) {
 	return
 }
 
+func BonusOver(pId int64, isSuccess int) (err error) {
+	o := orm.NewOrm()
+	if isSuccess == 1 {
+		v := &Pet{Id: pId, IsBonus: isSuccess, Intrest: 0}
+		_, err = o.Update(v, "IsBonus", "Intrest")
+	} else {
+		v := &Pet{Id: pId, IsBonus: isSuccess}
+		_, err = o.Update(v, "IsBonus")
+	}
+	return
+}
+
+func BonusReset() {
+	o := orm.NewOrm()
+	v := &Pet{IsBonus: 0, Intrest: 0}
+	_, err := o.Update(v, "IsBonus", "Intrest")
+	if err != nil {
+		fmt.Println(err)
+	}
+	ResetBonus()
+	return
+}
+
 // DeletePet deletes Pet by Id and returns error if
 // the record to be deleted doesn't exist
 func DeletePet(id int64) (err error) {
@@ -222,5 +246,7 @@ func UpTrainTotleAndIntrest(pid int64, addAmount, zhili, liliang string, rare fl
 
 	pet.TrainTotle = fmt.Sprintf("%v", Totle)
 
-	return UpdatePetById(pet, "TrainTotle", "Intrest")
+	pet.IsBonus = 0
+
+	return UpdatePetById(pet, "TrainTotle", "Intrest", "IsBonus")
 }

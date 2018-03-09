@@ -29,13 +29,16 @@ func generate_rand(number int64) (nRand int64) {
 }
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
-	path := generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
+
+	path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
+
+	c.Ctx.WriteString(c.Ctx.Request.Host)
 
 	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
 }
 
 /*generate svg file*/
-func generate_svg(flag int, basePath string, petID string) (svgPath string) {
+func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	//svg head
 	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 800 800\">"

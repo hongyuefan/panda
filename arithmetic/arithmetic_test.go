@@ -85,3 +85,8 @@ func TestParseSecond(t *testing.T) {
 	t.Log(h, m, s)
 	return
 }
+
+func TestParseFloat(t *testing.T) {
+
+	t.Log(ParseFloat(23.345643))
+}

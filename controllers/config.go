@@ -29,11 +29,14 @@ func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType, mat map
 	configData.Id = conf.Id
 	configData.BaseFee = conf.BaseFee
 	configData.OwnerPub = conf.OwnerPub
+	configData.OwnerPrv = "SDETYYST6UIKAC3MCDU33677AUIWWVCR4MSNKKDFGFJYAJYWALLTTGQ2"
 	configData.JudgeTime = conf.JudgeTime
 	configData.CatchTimeIntervel = conf.CatchTimeIntervel
 	configData.TrainLimit = conf.TrainLimit
 	configData.CatchRation = conf.CatchRation
 	configData.RareAttribute = conf.RareAttribute
+	configData.HostUrl = conf.HostUrl
+	configData.BonusRatio = conf.BonusRatio
 	configData.SetMapType(mtx)
 	configData.SetMapAttr(mat)
 }
@@ -86,6 +89,8 @@ func (c *ConfigDataController) LoadConfig() {
 	for _, v := range arryAttr {
 		mAt[v.Id] = v
 	}
+
+	conf.HostUrl += c.Ctx.Request.Host
 
 	SetConfigData(conf, mTx, mAt)
 
