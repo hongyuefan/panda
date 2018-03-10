@@ -220,6 +220,51 @@ func UpCatchTime(pid int64) (err error) {
 	return
 }
 
+func SetNormal(pid int64) (err error) {
+	o := orm.NewOrm()
+	v := &Pet{
+		Id:     pid,
+		Status: 0,
+	}
+	_, err = o.Update(v, "status")
+	return
+}
+
+func SetSelling(pid int64) (err error) {
+
+	o := orm.NewOrm()
+
+	v := &Pet{
+		Id:     pid,
+		Status: 1,
+	}
+
+	_, err = o.Update(v, "status")
+
+	return
+}
+
+func TransferPet(new_uid, pid int64) (err error) {
+	v := &Pet{Id: pid,
+		Uid:    new_uid,
+		Status: 0,
+	}
+	return UpdatePetById(v, "uid", "status")
+}
+
+func IsExistPet(uid, pid int64) (years int, err error) {
+	o := orm.NewOrm()
+	v := &Pet{
+		Id:  pid,
+		Uid: uid,
+	}
+	if err = o.Read(v, "Id", "Uid"); err != nil {
+		return
+	}
+	years = v.Years
+	return
+}
+
 func UpTrainTotleAndIntrest(pid int64, addAmount, zhili, liliang string, rare float64) (err error) {
 
 	pet, err := GetPetById(pid)

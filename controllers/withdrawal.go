@@ -26,7 +26,7 @@ func (c *WithDrawalController) HandlerWithDrawal() {
 	}
 	sAmount = c.Ctx.Request.FormValue("amount")
 
-	if txhash, err = c.trans.Transactions(types.Trans_Type_WithDrawal, userId, 0, sAmount); err != nil {
+	if txhash, err = c.trans.Transactions(types.Trans_Type_WithDrawal, userId, 0, 0, sAmount); err != nil {
 		goto errDeal
 	}
 	c.HandlerResult(true, nil, txhash)

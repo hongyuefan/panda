@@ -33,7 +33,7 @@ func (c *TrainController) HandlerTrainPet() {
 		goto errDeal
 	}
 
-	if txhash, err = c.trans.Transactions(types.Trans_Type_Train, userId, petId, sAmount); err != nil {
+	if txhash, err = c.trans.Transactions(types.Trans_Type_Train, userId, petId, 0, sAmount); err != nil {
 		goto errDeal
 	}
 	c.HandlerResult(true, nil, txhash)

@@ -16,7 +16,7 @@ func (c *BonusController) HandlerBonus() {
 		err error
 	)
 
-	if _, err = c.trans.Transactions(types.Trans_Type_Bonus, 0, 0, ""); err != nil {
+	if _, err = c.trans.Transactions(types.Trans_Type_Bonus, 0, 0, 0, ""); err != nil {
 		goto errDeal
 	}
 	c.HandlerResult(true, nil, "启动分红成功")

@@ -10,16 +10,17 @@ import (
 )
 
 type TransQ struct {
-	Id     int64  `orm:"column(id);auto"`
-	TxHash string `orm:"column(txhash);size(128)"`
-	Name   string `orm:"column(name);size(64)"`
-	Type   int64  `orm:"column(type);null"`
-	Status int    `orm:"column(status);null"`
-	UID    int64  `orm:"column(uid)"`
-	PID    int64  `orm:"column(pid)"`
-	Fee    string `orm:"column(fee);size(128)"`
-	Amount string `orm:"column(amount);size(128)"`
-	Time   int64  `orm:"column(transtime);null"`
+	Id       int64  `orm:"column(id);auto"`
+	TxHash   string `orm:"column(txhash);size(128)"`
+	Name     string `orm:"column(name);size(64)"`
+	Type     int64  `orm:"column(type);null"`
+	Status   int    `orm:"column(status);null"`
+	UID      int64  `orm:"column(uid)"`
+	Buyer_Id int64  `orm:"column(buyer_id)"`
+	PID      int64  `orm:"column(pid)"`
+	Fee      string `orm:"column(fee);size(128)"`
+	Amount   string `orm:"column(amount);size(128)"`
+	Time     int64  `orm:"column(transtime);null"`
 }
 
 func init() {

@@ -16,7 +16,7 @@ type TransactionContoller struct {
 	beego.Controller
 }
 
-func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount string) (txhash string, err error) {
+func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64, amount string) (txhash string, err error) {
 
 	var (
 		mPlay *models.Player
@@ -49,7 +49,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_WithDrawal, amount,
+		_, err = t.InsertTransQ(uid, pid, 0, types.Trans_Type_WithDrawal, amount,
 			conf.GetMapType()[types.Trans_Type_WithDrawal].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_WithDrawal].Name)
 		return
@@ -98,7 +98,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 		}
 
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Catch, conf.GetMapType()[types.Trans_Type_Catch].Amount,
+		_, err = t.InsertTransQ(uid, pid, 0, types.Trans_Type_Catch, conf.GetMapType()[types.Trans_Type_Catch].Amount,
 			conf.GetMapType()[types.Trans_Type_Catch].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Catch].Name)
 		return
@@ -124,7 +124,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
-		_, err = t.InsertTransQ(uid, pid, types.Trans_Type_Train, amount,
+		_, err = t.InsertTransQ(uid, pid, 0, types.Trans_Type_Train, amount,
 			conf.GetMapType()[types.Trans_Type_Train].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Train].Name)
 		return
@@ -136,7 +136,44 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			}
 		}()
 		return
-	case types.Trans_Type_Pet: //pet交易
+	case types.Trans_Type_Offer: //pet交易
+		var (
+			mOffer          *models.PetOffer
+			mBuyer, mSeller *models.Player
+			result          int
+			balance         string
+		)
+		if mBuyer, err = models.GetPlayerById(uid); err != nil {
+			return
+		}
+		if mOffer, err = models.GetOffer(offerId); err != nil {
+			return
+		}
+		if mSeller, err = models.GetPlayerById(mOffer.Uid); err != nil {
+			return
+		}
+		if _, err = models.IsExistPet(mOffer.Uid, mOffer.Pid); err != nil {
+			return
+		}
+
+		if balance, err = trans.GetBalance(mBuyer.PubPublic); err != nil {
+			return
+		}
+		if result, err = compareAmount(mOffer.Price, balance); err != nil {
+			return
+		}
+		if result > 0 {
+			err = types.Error_Trans_AmountOver
+			return
+		}
+
+		if txhash, err = trans.DoTransaction(mBuyer.PubPrivkey, mSeller.PubPublic, mOffer.Price); err != nil {
+			return
+		}
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		_, err = t.InsertTransQ(mOffer.Uid, mOffer.Pid, uid, types.Trans_Type_Offer, mOffer.Price,
+			conf.GetMapType()[types.Trans_Type_Offer].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_Offer].Name)
 		return
 	}
 	return "", types.Error_Trans_MisType
@@ -230,7 +267,7 @@ func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
 				}
 			}
 
-			_, err = t.InsertTransQ(v.(map[string]interface{})["Uid"].(int64), v.(map[string]interface{})["Id"].(int64), types.Trans_Type_Bonus, sBunos,
+			_, err = t.InsertTransQ(v.(map[string]interface{})["Uid"].(int64), v.(map[string]interface{})["Id"].(int64), 0, types.Trans_Type_Bonus, sBunos,
 				conf.GetMapType()[types.Trans_Type_Bonus].Fee, txhash,
 				conf.GetMapType()[types.Trans_Type_Bonus].Name)
 
@@ -244,18 +281,19 @@ func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
 	return
 }
 
-func (t *TransactionContoller) InsertTransQ(uid, pid, ntype int64, amount, fee, txhash, stype string) (tid int64, err error) {
+func (t *TransactionContoller) InsertTransQ(uid, pid, buyerId, ntype int64, amount, fee, txhash, stype string) (tid int64, err error) {
 
 	transQ := &models.TransQ{
-		TxHash: txhash,
-		Name:   stype,
-		Type:   ntype,
-		Status: types.Trans_Status_Waiting,
-		UID:    uid,
-		PID:    pid,
-		Fee:    fee,
-		Amount: amount,
-		Time:   time.Now().Unix(),
+		TxHash:   txhash,
+		Name:     stype,
+		Type:     ntype,
+		Status:   types.Trans_Status_Waiting,
+		UID:      uid,
+		Buyer_Id: buyerId,
+		PID:      pid,
+		Fee:      fee,
+		Amount:   amount,
+		Time:     time.Now().Unix(),
 	}
 	if tid, err = models.AddTrans(transQ); err != nil {
 		beego.BeeLogger.Info("InsertTransQ Failed ,need mamual operation, txhash:%v,type:%v,uid:%v,fee:%v,amount:%v", txhash, ntype, uid, fee, amount)

@@ -14,6 +14,84 @@ type OfferController struct {
 	trans *TransactionContoller
 }
 
+func (c *OfferController) HandlerDeleteOffer() {
+	var (
+		err             error
+		sOfferId        string
+		offerId, userId int64
+		rspUpdate       types.RspUpdateOffer
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+	if userId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+
+	sOfferId = c.Ctx.Request.FormValue("offerId")
+
+	if offerId, err = strconv.ParseInt(sOfferId, 10, 64); err != nil {
+		goto errDeal
+	}
+	if err = models.DeleteOffer(offerId, userId); err != nil {
+		goto errDeal
+	}
+	rspUpdate = types.RspUpdateOffer{
+		Success: true,
+	}
+	c.Ctx.Output.JSON(rspUpdate, false, false)
+	return
+errDeal:
+	rspUpdate = types.RspUpdateOffer{
+		Success: false,
+		Message: err.Error(),
+	}
+	c.Ctx.Output.JSON(rspUpdate, false, false)
+	return
+}
+
+func (c *OfferController) HandlerUpdatePrice() {
+	var (
+		sOfferId        string
+		sPrice          string
+		err             error
+		userId, offerId int64
+		rspUpdate       types.RspUpdateOffer
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+	if userId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+	sOfferId = c.Ctx.Request.FormValue("offerId")
+	sPrice = c.Ctx.Request.FormValue("price")
+
+	if offerId, err = strconv.ParseInt(sOfferId, 10, 64); err != nil {
+		goto errDeal
+	}
+	if _, err = strconv.ParseFloat(sPrice, 64); err != nil {
+		goto errDeal
+	}
+
+	if err = models.UpdateOfferPrice(offerId, userId, sPrice); err != nil {
+		goto errDeal
+	}
+
+	rspUpdate = types.RspUpdateOffer{
+		Success: true,
+	}
+	c.Ctx.Output.JSON(rspUpdate, false, false)
+	return
+errDeal:
+	rspUpdate = types.RspUpdateOffer{
+		Success: false,
+		Message: err.Error(),
+	}
+	c.Ctx.Output.JSON(rspUpdate, false, false)
+	return
+}
+
 func (c *OfferController) HandlerGetOffer() {
 	var (
 		sPetId, sUid, sStatus          string
@@ -89,6 +167,52 @@ func (c *OfferController) HandlerGetOfferResult(total int, offers []types.GetOff
 		Offers: offers,
 	}
 	c.Ctx.Output.JSON(respOffers, false, false)
+}
+
+func (c *OfferController) HandlerBuyPet() {
+	var (
+		sofferId, txhash string
+		buyerId, offerId int64
+		err              error
+		ok               bool
+		rspTransPet      types.RspTransPet
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+	if buyerId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+
+	sofferId = c.Ctx.Request.FormValue("offerId")
+
+	if offerId, err = strconv.ParseInt(sofferId, 10, 64); err != nil {
+		goto errDeal
+	}
+
+	if ok, err = models.IsOfferNormal(offerId); err != nil {
+		goto errDeal
+	}
+	if !ok {
+		err = fmt.Errorf("宠物交易处理中，暂时不能买卖")
+		goto errDeal
+	}
+	if txhash, err = c.trans.Transactions(types.Trans_Type_Offer, buyerId, 0, offerId, "0"); err != nil {
+		goto errDeal
+	}
+	rspTransPet = types.RspTransPet{
+		Success: true,
+		TxHash:  txhash,
+	}
+	c.Ctx.Output.JSON(rspTransPet, false, false)
+	return
+errDeal:
+	rspTransPet = types.RspTransPet{
+		Success: false,
+		Message: err.Error(),
+	}
+	c.Ctx.Output.JSON(rspTransPet, false, false)
+	return
 }
 
 func (c *OfferController) HandlerDoOffer() {

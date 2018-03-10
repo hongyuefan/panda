@@ -102,7 +102,7 @@ func (c *PandaCatchController) HandlerPandaCatch() {
 		goto errDeal
 	}
 
-	if txhash, err = c.trans.Transactions(types.Trans_Type_Catch, userId, petId, ""); err != nil {
+	if txhash, err = c.trans.Transactions(types.Trans_Type_Catch, userId, petId, 0, ""); err != nil {
 		goto errDeal
 	}
 
@@ -136,16 +136,5 @@ func IsExistPanda(uid, pid int64) (year int, err error) {
 		return 0, fmt.Errorf("request param error")
 	}
 
-	pet := &models.Pet{
-		Id:  pid,
-		Uid: uid,
-	}
-
-	orm := models.NewCommon()
-
-	if err = orm.CommonGetOne(pet, "Id", "Uid"); err != nil {
-		return 0, err
-	}
-
-	return pet.Years, nil
+	return models.IsExistPet(uid, pid)
 }

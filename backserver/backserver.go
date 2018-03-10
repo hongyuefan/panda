@@ -82,12 +82,12 @@ func (s *BackServer) JudgeTransaction() (err error) {
 			v.Status = types.Trans_Status_Success
 			models.UpdateTransById(v, "Status")
 		}
-		s.JudgeResult(result, v.Type, v.TxHash, v.Amount, v.Id, v.UID, v.PID)
+		s.JudgeResult(result, v.Type, v.TxHash, v.Amount, v.Id, v.UID, v.PID, v.Buyer_Id)
 	}
 	return
 }
 
-func (s *BackServer) JudgeResult(result int, itype int64, txhash, amount string, txid, uid, pid int64) {
+func (s *BackServer) JudgeResult(result int, itype int64, txhash, amount string, txid, uid, pid, buyerId int64) {
 	switch itype {
 	case types.Trans_Type_Catch:
 		if result == t.Trans_Success {
@@ -113,6 +113,19 @@ func (s *BackServer) JudgeResult(result int, itype int64, txhash, amount string,
 		}
 		if models.IsBonusOver() {
 			models.BonusReset()
+		}
+	case types.Trans_Type_Offer:
+		if result == t.Trans_Success {
+			if err := models.Offer_Over(uid, pid); err != nil {
+				beego.BeeLogger.Error("Transfer Pet Offer_Over error %v,buyId %v,seller %v,Pid %v", err, buyerId, uid, pid)
+			}
+			if err := models.TransferPet(buyerId, pid); err != nil {
+				beego.BeeLogger.Error("Transfer Pet  error %v,buyId %v,seller %v,Pid %v", err, buyerId, uid, pid)
+			}
+		} else if result == t.Trans_Failed {
+			if err := models.Offer_Rollback(uid, pid); err != nil {
+				beego.BeeLogger.Error("Transfer Pet Offer_Rollback error %v,buyId %v,seller %v,Pid %v", err, buyerId, uid, pid)
+			}
 		}
 	}
 }

@@ -1,11 +1,21 @@
 package types
 
+type RspTransPet struct {
+	Success bool   `json:"success"`
+	TxHash  string `json:"txhash"`
+	Message string `json:"message"`
+}
+
 type RspAddOffer struct {
 	Success bool   `json:"success"`
 	OfferId string `json:"offerId"`
 	Message string `json:"message"`
 }
 
+type RspUpdateOffer struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
 type GetOffers struct {
 	Id         int64  `json:"OfferId"`
 	Years      int    `json:"years"`

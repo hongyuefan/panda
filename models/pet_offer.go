@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	Offer_Doing = 0x02
+	Offer_Normal = 0x00
+	Offer_Doing  = 0x02
 )
 
 type PetOffer struct {
@@ -33,6 +34,15 @@ func init() {
 	orm.RegisterModel(new(PetOffer))
 }
 
+func GetOffer(offerId int64) (petOffer *PetOffer, err error) {
+	o := orm.NewOrm()
+	petOffer = &PetOffer{
+		Id: offerId,
+	}
+	err = o.Read(petOffer)
+	return
+}
+
 func AddOffer(pid int64, uid int64, years int, price string) (id int64, err error) {
 	o := orm.NewOrm()
 	v := &PetOffer{
@@ -43,32 +53,101 @@ func AddOffer(pid int64, uid int64, years int, price string) (id int64, err erro
 		Status:     0,
 		CreateTime: time.Now().Unix(),
 	}
-	return o.Insert(v)
+	if id, err = o.Insert(v); err != nil {
+		return
+	}
+
+	SetSelling(pid)
+
+	return
 }
 
-func UpdateOfferPrice(id int64, price string) (err error) {
+func IsOfferNormal(offerId int64) (ok bool, err error) {
+	o := orm.NewOrm()
+	v := &PetOffer{
+		Id: offerId,
+	}
+	if err = o.Read(v); err != nil {
+		return
+	}
+	if v.Status == Offer_Normal {
+		return true, nil
+	}
+	return false, nil
+}
+
+func UpdateOfferPrice(id int64, uid int64, price string) (err error) {
 	o := orm.NewOrm()
 	v := &PetOffer{
 		Id:         id,
+		Uid:        uid,
 		Price:      price,
 		UpdateTime: time.Now().Unix(),
+	}
+	count, err := o.QueryTable(new(PetOffer)).Filter("id", id).Filter("uid", uid).Count()
+	if err != nil {
+		return err
+	}
+	if count <= 0 {
+		return fmt.Errorf("offer not exist")
 	}
 	_, err = o.Update(v, "Price", "UpdateTime")
 	return
 }
 
-func DeleteOffer(id int64) (err error) {
+func Offer_Rollback(uid, pid int64) (err error) {
+
 	o := orm.NewOrm()
+
 	v := &PetOffer{
-		Id: id,
+		Uid: uid,
+		Pid: pid,
 	}
-	if err = o.Read(v); err != nil {
+	if err = o.Read(v, "Uid", "Pid"); err != nil {
 		return
+	}
+	v.Status = Offer_Normal
+
+	_, err = o.Update(v, "status")
+
+	return
+}
+
+func Offer_Over(uid, pid int64) (err error) {
+
+	o := orm.NewOrm()
+
+	v := &PetOffer{
+		Uid: uid,
+		Pid: pid,
+	}
+
+	_, err = o.Delete(v, "Uid", "Pid")
+
+	return
+}
+
+func DeleteOffer(id, uid int64) (err error) {
+
+	o := orm.NewOrm()
+
+	v := &PetOffer{}
+
+	if err = o.QueryTable(new(PetOffer)).Filter("id", id).Filter("uid", uid).One(v); err != nil {
+		return err
+	}
+	if v.Id <= 0 {
+		return fmt.Errorf("offer not exist")
 	}
 	if v.Status == Offer_Doing {
 		return fmt.Errorf("交易进行中，不能撤销")
 	}
-	_, err = o.Delete(&PetOffer{Id: id})
+	if _, err = o.Delete(&PetOffer{Id: id}); err != nil {
+		return
+	}
+
+	SetNormal(v.Pid)
+
 	return
 }
 
