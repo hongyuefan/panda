@@ -25,7 +25,6 @@ type GetPetAttr struct {
 	Value string `json:"value"`
 }
 type RspGetPetAttr struct {
-	Uid   string       `json:"memberid"`
 	Pid   string       `json:"number"`
 	Years int          `json:"years"`
 	Attrs []GetPetAttr `json:"attributes"`

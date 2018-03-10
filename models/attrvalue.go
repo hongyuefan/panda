@@ -10,9 +10,9 @@ import (
 )
 
 type Attrvalue struct {
-	Id    int64  `orm:"column(id);auto"`
-	Pid   int64  `orm:"column(pid)"`
-	Uid   int64  `orm:"column(uid)"`
+	Id  int64 `orm:"column(id);auto"`
+	Pid int64 `orm:"column(pid)"`
+	//Uid   int64  `orm:"column(uid)"`
 	Aid   int64  `orm:"column(aid)"`
 	Years int    `orm:"column(years)"`
 	Value string `orm:"column(value);size(64);null"`
@@ -27,10 +27,10 @@ func init() {
 	orm.RegisterModel(new(Attrvalue))
 }
 
-func NewAttrvalue(pid, uid, aid int64, years int, value string) *Attrvalue {
+func NewAttrvalue(pid, aid int64, years int, value string) *Attrvalue {
 	return &Attrvalue{
-		Pid:   pid,
-		Uid:   uid,
+		Pid: pid,
+		//Uid:   uid,
 		Aid:   aid,
 		Years: years,
 		Value: value,

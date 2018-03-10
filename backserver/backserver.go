@@ -137,15 +137,15 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 		return
 	}
 
-	mjAttr, err := s.getAttr(uid, pid, types.Attr_Type_Minjie)
+	mjAttr, err := s.getAttr(pid, types.Attr_Type_Minjie)
 	if err != nil {
 		return
 	}
-	llAttr, err := s.getAttr(uid, pid, types.Attr_Type_Liliang)
+	llAttr, err := s.getAttr(pid, types.Attr_Type_Liliang)
 	if err != nil {
 		return
 	}
-	zlAttr, err := s.getAttr(uid, pid, types.Attr_Type_Zhili)
+	zlAttr, err := s.getAttr(pid, types.Attr_Type_Zhili)
 	if err != nil {
 		return
 	}
@@ -179,14 +179,14 @@ func (s *BackServer) upDateAttrValue(attr *models.Attrvalue) (err error) {
 	return
 }
 
-func (s *BackServer) getAttr(uid, pid, aid int64) (attr *models.Attrvalue, err error) {
+func (s *BackServer) getAttr(pid, aid int64) (attr *models.Attrvalue, err error) {
 	attr = &models.Attrvalue{
-		Uid: uid,
+		//Uid: uid,
 		Pid: pid,
 		Aid: aid,
 	}
-	if err = s.com.CommonGetOne(attr, "Uid", "Pid", "Aid"); err != nil {
-		beego.BeeLogger.Error(" getAttr Error %v ,Uid:%v,Pid:%v,Aid:%v", err, uid, pid, aid)
+	if err = s.com.CommonGetOne(attr, "Pid", "Aid"); err != nil {
+		beego.BeeLogger.Error(" getAttr Error %v ,Pid:%v,Aid:%v", err, pid, aid)
 		return
 	}
 	return
@@ -235,13 +235,13 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 		petId                     int64
 	)
 	attr := &models.Attrvalue{
-		Uid: uid,
+		//		Uid: uid,
 		Pid: pid,
 		Aid: types.Attr_Type_Minjie,
 	}
 
-	if err = s.com.CommonGetOne(attr, "Uid", "Pid", "Aid"); err != nil {
-		beego.BeeLogger.Error("CatchResult GetAttrValue Error %v ,Uid:%v,Pid:%v", err, uid, pid)
+	if err = s.com.CommonGetOne(attr, "Pid", "Aid"); err != nil {
+		beego.BeeLogger.Error("CatchResult GetAttrValue Error %v ,Pid:%v", err, pid)
 		return
 	}
 	if result, err = arithmetic.CatchResult(txhash, attr.Value); err != nil {
@@ -293,27 +293,27 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 			return
 		}
 
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Minjie, attr.Years+1, fmt.Sprintf("%v", mjValue))); err != nil {
-			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
-				err, types.Attr_Type_Minjie, uid, cid, petId, txhash, attr.Years+1)
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Minjie, attr.Years+1, fmt.Sprintf("%v", mjValue))); err != nil {
+			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+				err, types.Attr_Type_Minjie, cid, petId, txhash, attr.Years+1)
 			return
 		}
 		if llValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Liliang].Limit); err != nil {
 			beego.BeeLogger.Error("CatchResult RandValue Error %v", err)
 			return
 		}
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Liliang, attr.Years+1, fmt.Sprintf("%v", llValue))); err != nil {
-			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
-				err, types.Attr_Type_Liliang, uid, cid, petId, txhash, attr.Years+1)
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Liliang, attr.Years+1, fmt.Sprintf("%v", llValue))); err != nil {
+			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+				err, types.Attr_Type_Liliang, cid, petId, txhash, attr.Years+1)
 			return
 		}
 		if zlValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Zhili].Limit); err != nil {
 			beego.BeeLogger.Error("CatchResult RandValue Error %v", err)
 			return
 		}
-		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, uid, types.Attr_Type_Zhili, attr.Years+1, fmt.Sprintf("%v", zlValue))); err != nil {
-			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v Uid %v,Cid %v,Fid %v,Petnam %v,years %v",
-				err, types.Attr_Type_Zhili, uid, cid, pid, txhash, attr.Years+1)
+		if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Zhili, attr.Years+1, fmt.Sprintf("%v", zlValue))); err != nil {
+			beego.BeeLogger.Info("CatchResult AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+				err, types.Attr_Type_Zhili, cid, pid, txhash, attr.Years+1)
 			return
 		}
 

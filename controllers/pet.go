@@ -47,7 +47,6 @@ func (t *PetController) HandlerGetPetAttribute() {
 		attrValues = append(attrValues, attrValue)
 	}
 
-	petAttr.Uid = fmt.Sprintf("%v", atv.Uid)
 	petAttr.Pid = fmt.Sprintf("%v", atv.Pid)
 	petAttr.Years = atv.Years
 	petAttr.Attrs = attrValues

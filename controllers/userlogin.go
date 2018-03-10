@@ -173,11 +173,9 @@ func (c *UserLoginController) ModifyNickName() {
 
 	var (
 		nickName string
-		userId   int64
 		mUser    models.Player
 		err      error
 		orm      *models.Common
-		token    string
 	)
 
 	type Result struct {
@@ -191,20 +189,11 @@ func (c *UserLoginController) ModifyNickName() {
 
 	nickName = c.Ctx.Request.FormValue("nickname")
 
-	if token, err = ParseToken(c.Ctx.Input.Header("Authorization")); err != nil {
-		goto errDeal
-	}
-	if userId, err = TokenValidate(token); err != nil {
+	if mUser.Id, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal
 	}
 
 	orm = models.NewCommon()
-
-	mUser.Id = userId
-
-	//	if err = orm.CommonGetOne(&mUser, "id"); err != nil {
-	//		goto errDeal
-	//	}
 
 	mUser.Nickname = nickName
 
@@ -232,10 +221,6 @@ func (c *UserLoginController) UserLogin() {
 		token, balance string
 		err            error
 	)
-
-	//	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reqLogin); err != nil {
-	//		goto errDeal
-	//	}
 
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal

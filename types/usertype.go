@@ -9,7 +9,7 @@ var (
 	USER_REGIST_OK = "user regist success"
 
 	USER_LOGIN_SUCCESS = "user login success"
-	USER_LOGIN_FAILED  = "user login failed"
+	USER_LOGIN_FAILED  = "用户登录失败，用户名或密码错误"
 
 	VERIFY_VALID_FAILED  = "verify failed"
 	VERIFY_VALID_SUCCESS = "verify success"

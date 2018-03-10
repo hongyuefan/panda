@@ -10,14 +10,14 @@ type Errortail struct {
 	Code     string `json:"required"`
 }
 type ErrorMsg struct {
-	Message string      `json:"message"`
-	Errors  []Errortail `json:"errors"`
+	Message string    `json:"message"`
+	Errors  Errortail `json:"errors"`
 }
 
 func ErrorHandler(ctx *context.Context, err error) {
 	msg := &ErrorMsg{
 		Message: err.Error(),
-		Errors:  []Errortail{Errortail{}},
+		Errors:  Errortail{},
 	}
 	ctx.Output.JSON(msg, false, false)
 	return

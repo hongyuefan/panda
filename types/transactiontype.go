@@ -24,6 +24,7 @@ var (
 	Trans_Type_Catch      int64 = 2
 	Trans_Type_Train      int64 = 3
 	Trans_Type_Bonus      int64 = 4
+	Trans_Type_Pet        int64 = 5
 )
 
 var (

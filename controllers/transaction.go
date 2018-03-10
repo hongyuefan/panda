@@ -136,7 +136,8 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid int64, amount 
 			}
 		}()
 		return
-
+	case types.Trans_Type_Pet: //pet交易
+		return
 	}
 	return "", types.Error_Trans_MisType
 
