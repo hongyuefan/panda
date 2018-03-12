@@ -102,6 +102,10 @@ func (c *PandaCatchController) HandlerPandaCatch() {
 		goto errDeal
 	}
 
+	if err = models.IsPetYearsLess(petId); err != nil {
+		goto errDeal
+	}
+
 	if txhash, err = c.trans.Transactions(types.Trans_Type_Catch, userId, petId, 0, ""); err != nil {
 		goto errDeal
 	}

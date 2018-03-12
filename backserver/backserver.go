@@ -127,6 +127,12 @@ func (s *BackServer) JudgeResult(result int, itype int64, txhash, amount string,
 				beego.BeeLogger.Error("Transfer Pet Offer_Rollback error %v,buyId %v,seller %v,Pid %v", err, buyerId, uid, pid)
 			}
 		}
+	case types.Trans_Type_Gambling:
+		if result == t.Trans_Success {
+			s.GamblingSuccess(txhash, uid)
+		} else if result == t.Trans_Failed {
+			beego.BeeLogger.Error("Gambling error txhash:%v,uid:%v", txhash, uid)
+		}
 	}
 }
 
@@ -240,6 +246,95 @@ func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount str
 	return
 }
 
+func (s *BackServer) GamblingSuccess(txhash string, uid int64) {
+	var (
+		err                       error
+		mRand                     float64
+		years                     int
+		mjValue, llValue, zlValue float64
+		arryYearCount             []*models.YearsCount
+		small, big                float64
+		petId                     int64
+	)
+
+	if arryYearCount, err = models.GetAllYearsCount(); err != nil {
+		beego.BeeLogger.Error("GamblingSuccess GetAllYearsCount Error: %v,%v,%v", err, uid, petId)
+		return
+	}
+
+	mRand = arithmetic.GetRand(0, 100)
+
+	for _, v := range arryYearCount {
+		if small, big, err = arithmetic.SplitAndParseToFloat(v.Range); err != nil || big <= 0 {
+			beego.BeeLogger.Error("GamblingSuccess %v", err)
+			continue
+		}
+		if v.Count >= v.Limit {
+			continue
+		}
+		if mRand >= small && mRand <= big {
+			years = v.Id
+		}
+	}
+
+	svgPath := s.Generate_svg(0, beego.AppConfig.String("svg_path"), fmt.Sprintf("%v", 0))
+
+	pet := &models.Pet{
+		Uid:           uid,
+		Cid:           0,
+		Fid:           0,
+		Petname:       txhash,
+		Years:         years,
+		SvgPath:       s.conf.HostUrl + types.Svg_File_Path + "/" + svgPath,
+		Status:        0,
+		TrainTotle:    "0",
+		LastCatchTime: time.Now().Unix(),
+		CreatTime:     time.Now().Unix(),
+		CatchTimes:    0,
+		IsRare:        1,
+		IsBonus:       0,
+	}
+
+	if petId, err = models.AddPet(pet); err != nil {
+		beego.BeeLogger.Info("GamblingSuccess AddPet Error %v need operation manual:Uid %v,Cid %v,Fid %v,Petnam %v,years %v,svgpath %v",
+			err, uid, 0, 0, txhash, years, "svgpath")
+		return
+	}
+
+	if mjValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Minjie].Limit); err != nil {
+		beego.BeeLogger.Error("GamblingSuccess RandValue Error %v", err)
+		return
+	}
+
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Minjie, years, fmt.Sprintf("%v", mjValue))); err != nil {
+		beego.BeeLogger.Info("GamblingSuccess AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Minjie, 0, petId, txhash, years)
+		return
+	}
+	if llValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Liliang].Limit); err != nil {
+		beego.BeeLogger.Error("GamblingSuccess RandValue Error %v", err)
+		return
+	}
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Liliang, years, fmt.Sprintf("%v", llValue))); err != nil {
+		beego.BeeLogger.Info("GamblingSuccess AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Liliang, 0, petId, txhash, years)
+		return
+	}
+	if zlValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Zhili].Limit); err != nil {
+		beego.BeeLogger.Error("GamblingSuccess RandValue Error %v", err)
+		return
+	}
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Zhili, years, fmt.Sprintf("%v", zlValue))); err != nil {
+		beego.BeeLogger.Info("GamblingSuccess AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Zhili, 0, petId, txhash, years)
+		return
+	}
+	if err = models.SubPlayerGamblingCount(uid); err != nil {
+		beego.BeeLogger.Error("GamblingSuccess SubPlayerGamblingCount Error:%v", err)
+	}
+	return
+}
+
 func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 	var (
 		err                       error
@@ -277,7 +372,7 @@ func (s *BackServer) CatchResult(txhash string, txid, uid, pid int64) {
 	}
 	if result != 0 {
 		//TODO:生成svg文件，返回路径
-		svgPath := s.Generate_svg(result, beego.AppConfig.String("svg_path"), fmt.Sprintf("%v", pid))
+		svgPath := s.Generate_svg(result-1, beego.AppConfig.String("svg_path"), fmt.Sprintf("%v", pid))
 
 		pet := &models.Pet{
 			Uid:           uid,
@@ -344,6 +439,7 @@ func (s *BackServer) RandValue(attrLimit string) (value float64, err error) {
 	return
 }
 
+/*generate svg file*/
 func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	//svg head
@@ -382,58 +478,19 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 		case 0:
 			//use random color
 			if bodycolor_flag == 1 {
-
+				// eye, ear, leg, hand
 				rand := generate_rand(models.GetCountByCatagoryId(catagory_id) / 7)
 				if rand == -1 {
 					break
 				}
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["base_color"] = fmt.Sprintf("%v", color)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 1, color, rand)
 			} else {
 				// bodyline
-				count := models.GetCountByCatagoryId(catagory_id)
-
-				if count == 0 {
+				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
+				if rand == -1 {
 					break
 				}
-				rand := generate_rand(count)
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 0, 0, rand)
 			}
 
 		case 1:
@@ -447,80 +504,25 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 				if count == 0 {
 					break
 				}
-				rand := generate_rand(count)
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 0, 0, rand)
 			}
 
 		default:
 			//choose one; drop another
 			//How many items where select_flag = this, calculator only first time.
 			if selectflag_times[select_flag] == selectflag_check[select_flag] {
-				if bodycolor_flag == 1 {
+				if bodycolor_flag == 1 { //leg
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id) / 7)
 					if rand == -1 {
 						break
 					}
-
-					query := make(map[string]string, 0)
-					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-					query["base_color"] = fmt.Sprintf("%v", color)
-					query["p_id"] = fmt.Sprintf("%v", 0)
-					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-					for _, v := range resultl {
-						svg += v.(models.Svg_info).Svg_dtl
-						if v.(models.Svg_info).N_id != 0 {
-							// link the next svg to be strcat
-							query := make(map[string]string, 0)
-							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-							for _, v := range resultl {
-								svg += v.(models.Svg_info).Svg_dtl
-							}
-						}
-					}
-				} else {
+					svg += getSvgDetail(catagory_id, 1, color, rand)
+				} else { // hat && front_hair
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
 					if rand == -1 {
 						break
 					}
-
-					query := make(map[string]string, 0)
-					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-					query["p_id"] = fmt.Sprintf("%v", 0)
-					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-					for _, v := range resultl {
-						svg += v.(models.Svg_info).Svg_dtl
-						// link the next svg to be strcat
-						if v.(models.Svg_info).N_id != 0 {
-							query := make(map[string]string, 0)
-							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-							for _, v := range resultl {
-								svg += v.(models.Svg_info).Svg_dtl
-							}
-						}
-					}
+					svg += getSvgDetail(catagory_id, 0, 0, rand)
 				}
 			} else {
 				//do nothing
@@ -550,6 +552,18 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 	return fileName
 }
 
+/*get random number*/
+func generate_rand(number int64) (nRand int64) {
+	if number <= 0 {
+		return -1
+	}
+
+	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	return int64(seed.Intn(int(number)))
+}
+
+/*Get svg information by catagory id, color(random, if have) and index number(random)*/
 func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64) (svg_detail string) {
 	query := make(map[string]string, 0)
 	if color_flag == 1 {
@@ -573,15 +587,4 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64) (
 		}
 	}
 	return svg_detail
-}
-
-/*get random number*/
-func generate_rand(number int64) (nRand int64) {
-	if number <= 0 {
-		return -1
-	}
-
-	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	return int64(seed.Intn(int(number)))
 }

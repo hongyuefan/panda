@@ -25,6 +25,7 @@ var (
 	Trans_Type_Train      int64 = 3
 	Trans_Type_Bonus      int64 = 4
 	Trans_Type_Offer      int64 = 5
+	Trans_Type_Gambling   int64 = 6
 )
 
 var (

@@ -175,7 +175,34 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 			conf.GetMapType()[types.Trans_Type_Offer].Fee, txhash,
 			conf.GetMapType()[types.Trans_Type_Offer].Name)
 		return
+	case types.Trans_Type_Gambling: //抽奖
+		var (
+			balance string
+			result  int
+		)
+		if mPlay, err = models.GetPlayerById(uid); err != nil {
+			return
+		}
+		if balance, err = trans.GetBalance(mPlay.PubPublic); err != nil {
+			return
+		}
+		if result, err = compareAmount(conf.GetMapType()[types.Trans_Type_Gambling].Amount, balance); err != nil {
+			return
+		}
+		if result > 0 {
+			err = types.Error_Trans_AmountOver
+			return
+		}
+		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Gambling].Amount); err != nil {
+			return
+		}
+		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
+		_, err = t.InsertTransQ(uid, 0, 0, types.Trans_Type_Gambling, conf.GetMapType()[types.Trans_Type_Gambling].Amount,
+			conf.GetMapType()[types.Trans_Type_Gambling].Fee, txhash,
+			conf.GetMapType()[types.Trans_Type_Gambling].Name)
+		return
 	}
+
 	return "", types.Error_Trans_MisType
 
 }

@@ -28,11 +28,36 @@ func generate_rand(number int64) (nRand int64) {
 	return int64(seed.Intn(int(number)))
 }
 
+/*Get svg information by catagory id, color(random, if have) and index number(random)*/
+func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64) (svg_detail string) {
+	query := make(map[string]string, 0)
+	if color_flag == 1 {
+		query["base_color"] = fmt.Sprintf("%v", color)
+	}
+	query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+	query["p_id"] = fmt.Sprintf("%v", 0)
+	resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, index, 1)
+
+	for _, v := range resultl {
+		svg_detail = v.(models.Svg_info).Svg_dtl
+		// link the next svg to be strcat
+		if v.(models.Svg_info).N_id != 0 {
+			query := make(map[string]string, 0)
+			query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
+			query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
+			resultlin, _ := models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
+			for _, vin := range resultlin {
+				svg_detail += vin.(models.Svg_info).Svg_dtl
+			}
+		}
+	}
+	return svg_detail
+}
+
 func (c *GeneratesvgfileController) HandlerGenerate() {
+	//path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
 
-	path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
-
-	c.Ctx.WriteString(c.Ctx.Request.Host)
+	path := c.Generate_svg(0, "c://", "1")
 
 	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
 }
@@ -41,7 +66,7 @@ func (c *GeneratesvgfileController) HandlerGenerate() {
 func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	//svg head
-	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 800 800\">"
+	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"-100 0 800 800\">"
 
 	//random for panda base color
 	color := generate_rand(7)
@@ -76,58 +101,19 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 		case 0:
 			//use random color
 			if bodycolor_flag == 1 {
-
+				// eye, ear, leg, hand
 				rand := generate_rand(models.GetCountByCatagoryId(catagory_id) / 7)
 				if rand == -1 {
 					break
 				}
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["base_color"] = fmt.Sprintf("%v", color)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 1, color, rand)
 			} else {
 				// bodyline
-				count := models.GetCountByCatagoryId(catagory_id)
-
-				if count == 0 {
+				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
+				if rand == -1 {
 					break
 				}
-				rand := generate_rand(count)
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 0, 0, rand)
 			}
 
 		case 1:
@@ -141,80 +127,25 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 				if count == 0 {
 					break
 				}
-				rand := generate_rand(count)
-
-				query := make(map[string]string, 0)
-				query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-				query["p_id"] = fmt.Sprintf("%v", 0)
-				resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-				for _, v := range resultl {
-					svg += v.(models.Svg_info).Svg_dtl
-					// link the next svg to be strcat
-					if v.(models.Svg_info).N_id != 0 {
-						query := make(map[string]string, 0)
-						query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-						query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-						models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-						for _, v := range resultl {
-							svg += v.(models.Svg_info).Svg_dtl
-						}
-					}
-				}
+				svg += getSvgDetail(catagory_id, 0, 0, rand)
 			}
 
 		default:
 			//choose one; drop another
 			//How many items where select_flag = this, calculator only first time.
 			if selectflag_times[select_flag] == selectflag_check[select_flag] {
-				if bodycolor_flag == 1 {
+				if bodycolor_flag == 1 { //leg
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id) / 7)
 					if rand == -1 {
 						break
 					}
-
-					query := make(map[string]string, 0)
-					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-					query["base_color"] = fmt.Sprintf("%v", color)
-					query["p_id"] = fmt.Sprintf("%v", 0)
-					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-
-					for _, v := range resultl {
-						svg += v.(models.Svg_info).Svg_dtl
-						if v.(models.Svg_info).N_id != 0 {
-							// link the next svg to be strcat
-							query := make(map[string]string, 0)
-							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-							for _, v := range resultl {
-								svg += v.(models.Svg_info).Svg_dtl
-							}
-						}
-					}
-				} else {
+					svg += getSvgDetail(catagory_id, 1, color, rand)
+				} else { // hat && front_hair
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
 					if rand == -1 {
 						break
 					}
-
-					query := make(map[string]string, 0)
-					query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-					query["p_id"] = fmt.Sprintf("%v", 0)
-					resultl, _ := models.GetAllSvginfo(query, []string{}, []string{"s_id"}, []string{"asc"}, rand, 1)
-					for _, v := range resultl {
-						svg += v.(models.Svg_info).Svg_dtl
-						// link the next svg to be strcat
-						if v.(models.Svg_info).N_id != 0 {
-							query := make(map[string]string, 0)
-							query["catagory_id"] = fmt.Sprintf("%v", catagory_id)
-							query["s_id"] = fmt.Sprintf("%v", v.(models.Svg_info).N_id)
-							models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
-							for _, v := range resultl {
-								svg += v.(models.Svg_info).Svg_dtl
-							}
-						}
-					}
+					svg += getSvgDetail(catagory_id, 0, 0, rand)
 				}
 			} else {
 				//do nothing

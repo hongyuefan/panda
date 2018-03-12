@@ -118,12 +118,13 @@ func (c *UserLoginController) RegistUser() {
 	}
 
 	mUser = &models.Player{
-		Nickname:   reqRgt.NickName,
-		Email:      reqRgt.UserName,
-		Password:   reqRgt.Password,
-		Createtime: time.Now().Unix(),
-		PubPublic:  public,
-		PubPrivkey: privkey,
+		Nickname:    reqRgt.NickName,
+		Email:       reqRgt.UserName,
+		Password:    reqRgt.Password,
+		Createtime:  time.Now().Unix(),
+		PubPublic:   public,
+		PubPrivkey:  privkey,
+		GamblingNum: types.Gambling_Num_Default,
 	}
 	orm = models.NewCommon()
 

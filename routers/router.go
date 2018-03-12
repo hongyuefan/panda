@@ -42,6 +42,8 @@ func init() {
 	beego.Router("/v1/tsxm/offer/update", &controllers.OfferController{}, "get:HandlerUpdatePrice")
 	beego.Router("/v1/tsxm/offer/delete", &controllers.OfferController{}, "get:HandlerDeleteOffer")
 	beego.Router("/v1/tsxm/offer/buy", &controllers.OfferController{}, "get:HandlerBuyPet")
+	beego.Router("/v1/tsxm/luckdraw", &controllers.GamblingController{}, "get:HandlerGambling")
+	beego.Router("/v1/tsxm/notice", &controllers.NoticeController{}, "get:HandlerNotice")
 
 	beego.Router("/v1/tsxm/test", &controllers.GeneratesvgfileController{}, "get:HandlerGenerate")
 

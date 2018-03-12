@@ -42,7 +42,13 @@ func init() {
 // last inserted Id on success.
 func AddPet(m *Pet) (id int64, err error) {
 	o := orm.NewOrm()
-	return o.Insert(m)
+	if id, err = o.Insert(m); err != nil {
+		return
+	}
+	if err = AddYearsCount(m.Years); err != nil {
+		return
+	}
+	return
 }
 
 func GetIntrest(pid int64) (intrest int64, err error) {
@@ -241,6 +247,18 @@ func SetSelling(pid int64) (err error) {
 
 	_, err = o.Update(v, "status")
 
+	return
+}
+
+func IsPetYearsLess(pid int64) (err error) {
+	o := orm.NewOrm()
+	v := &Pet{Id: pid}
+	if err = o.Read(v); err != nil {
+		return
+	}
+	if err = IsYearsOver(v.Years + 1); err != nil {
+		return
+	}
 	return
 }
 

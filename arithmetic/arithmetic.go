@@ -97,6 +97,24 @@ func GetMod(b byte, m byte) (byte, error) {
 	return b % m, nil
 }
 
+func SplitAndParseToFloat(s string) (small, big float64, err error) {
+
+	arry := strings.Split(s, "_")
+
+	if len(arry) != 2 {
+		err = fmt.Errorf("SplitAndParseToFloat params not right")
+		return
+	}
+
+	if small, err = strconv.ParseFloat(arry[0], 64); err != nil {
+		return
+	}
+	if big, err = strconv.ParseFloat(arry[1], 64); err != nil {
+		return
+	}
+	return
+}
+
 //翻转byte数组
 func OverturnArray(arry []byte) (arry_result []byte) {
 
@@ -145,6 +163,7 @@ func ParseSecond(second int64) (hour, min, sec int64) {
 	return
 }
 
+//取小数点后两位
 func ParseFloat(p float64) (result string) {
 
 	i_p := int64(p * 100)
