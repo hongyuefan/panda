@@ -50,4 +50,5 @@ type TransQData struct {
 	TxHash string `json:"txhash"`
 	Time   string `json:"time"`
 	Status string `json:"status"`
+	PetId  string `json:"number"`
 }

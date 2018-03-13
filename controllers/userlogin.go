@@ -80,6 +80,7 @@ func (c *UserLoginController) RegistUser() {
 	var (
 		reqRgt          types.ReqRegist
 		rspRgt          types.RspRegist
+		invitationCode  string
 		mUser           *models.Player
 		orm             *models.Common
 		public, privkey string
@@ -87,9 +88,6 @@ func (c *UserLoginController) RegistUser() {
 		uid             int64
 		err             error
 	)
-	//	if err = json.Unmarshal(c.Ctx.Input.RequestBody, &reqRgt); err != nil {
-	//		goto errDeal
-	//	}
 
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -100,6 +98,7 @@ func (c *UserLoginController) RegistUser() {
 	reqRgt.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
 	reqRgt.UserName = c.Ctx.Request.FormValue("userName")
 	reqRgt.VerifyCode = c.Ctx.Request.FormValue("verifyCode")
+	invitationCode = c.Ctx.Request.FormValue("code")
 
 	if err = ValidateEmail(reqRgt.UserName); err != nil {
 		goto errDeal
@@ -163,6 +162,11 @@ func (c *UserLoginController) RegistUser() {
 			Mypets:        "",
 		},
 	}
+
+	if invitationCode != "" {
+		models.UpdateInvitationCount(invitationCode)
+	}
+
 	c.Ctx.Output.JSON(rspRgt, false, false)
 	return
 errDeal:

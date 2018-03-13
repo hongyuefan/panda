@@ -90,3 +90,7 @@ func TestParseFloat(t *testing.T) {
 
 	t.Log(ParseFloat(23.345643))
 }
+
+func TestGencode(t *testing.T) {
+	t.Log(GenCode(6))
+}

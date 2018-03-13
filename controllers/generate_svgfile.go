@@ -56,7 +56,6 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64) (
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
 	//path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
-
 	path := c.Generate_svg(0, "c://", "1")
 
 	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
@@ -119,12 +118,22 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 		case 1:
 			//use random element
 			//Be or not be
-			rand := generate_rand(int64(100 / percent))
+			if percent > 50 && percent < 100 { // usual items
+				rand_flag := generate_rand(int64(100 / (100 - percent)))
+				if rand_flag == 0 {
+					break
+				}
+			} else { //	unusual	items
+				rand_flag := generate_rand(int64(100 / percent))
+				if rand_flag != 0 {
+					break
+				}
+			}
 
-			if (rand != 0 && percent != 1) || (flag == 1 && percent == 1) {
+			if (percent != 1) || (flag == 1 && percent == 1) {
 				//get count of this item
-				count := models.GetCountByCatagoryId(catagory_id)
-				if count == 0 {
+				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
+				if rand == -1 {
 					break
 				}
 				svg += getSvgDetail(catagory_id, 0, 0, rand)
@@ -147,8 +156,6 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 					}
 					svg += getSvgDetail(catagory_id, 0, 0, rand)
 				}
-			} else {
-				//do nothing
 			}
 			selectflag_times[select_flag]++
 		}

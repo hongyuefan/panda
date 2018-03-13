@@ -85,6 +85,7 @@ func (t *TransQContoller) GetTransQ() {
 		data.TxHash = v.(models.TransQ).TxHash
 		data.Time = fmt.Sprintf("%v", v.(models.TransQ).Time)
 		data.Type = fmt.Sprintf("%v", v.(models.TransQ).Type)
+		data.PetId = fmt.Sprintf("%v", v.(models.TransQ).PID)
 		data.Status = conf.GetMapType()[v.(models.TransQ).Type].Name + TranstateString(v.(models.TransQ).Status)
 		datas = append(datas, data)
 	}

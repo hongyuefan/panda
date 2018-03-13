@@ -37,6 +37,9 @@ func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType, mat map
 	configData.RareAttribute = conf.RareAttribute
 	configData.HostUrl = conf.HostUrl
 	configData.BonusRatio = conf.BonusRatio
+	configData.IsInvitation = conf.IsInvitation
+	configData.InvitationLimit = conf.InvitationLimit
+	configData.InvitationYears = conf.InvitationYears
 	configData.SetMapType(mtx)
 	configData.SetMapAttr(mat)
 }

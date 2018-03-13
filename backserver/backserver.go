@@ -45,11 +45,105 @@ func (s *BackServer) HandlerTransaction() {
 		select {
 		case <-ticker.C:
 			s.JudgeTransaction()
+			if s.conf.IsInvitation == 1 {
+				s.JudgeInvitation()
+			}
 		case <-s.chanExit:
 			ticker.Stop()
 			return
 		}
 	}
+}
+
+func (s *BackServer) JudgeInvitation() (err error) {
+	var (
+		query map[string]string
+		ml    []interface{}
+	)
+	query = make(map[string]string)
+	query["flag"] = "0"
+
+	for i := 0; ; i++ {
+		if ml, err = models.GetAllInvitations(query, []string{}, []string{"id"}, []string{"asc"}, int64(i*100), 100); err != nil {
+			break
+		}
+		for _, v := range ml {
+			if v.(models.Invitation).Count >= s.conf.InvitationLimit {
+				if err = s.GeneratePet(v.(models.Invitation).Uid, v.(models.Invitation).Code, s.conf.InvitationYears); err != nil {
+					continue
+				}
+				if err = models.SetInvitationFlag(v.(models.Invitation).Id, 1); err != nil {
+					beego.BeeLogger.Info("JudgeInvitation SetInvitationFlag Error %v need operation manual:Id %v", v.(models.Invitation).Id)
+				}
+			}
+
+		}
+		if len(ml) < 100 {
+			return
+		}
+	}
+
+	return
+}
+
+func (s *BackServer) GeneratePet(uid int64, txhash string, years int) (err error) {
+	var (
+		mjValue, llValue, zlValue float64
+		petId                     int64
+	)
+	svgPath := s.Generate_svg(0, beego.AppConfig.String("svg_path"), fmt.Sprintf("%v", 0))
+
+	pet := &models.Pet{
+		Uid:           uid,
+		Cid:           0,
+		Fid:           0,
+		Petname:       txhash,
+		Years:         years,
+		SvgPath:       s.conf.HostUrl + types.Svg_File_Path + "/" + svgPath,
+		Status:        0,
+		TrainTotle:    "0",
+		LastCatchTime: time.Now().Unix(),
+		CreatTime:     time.Now().Unix(),
+		CatchTimes:    0,
+		IsRare:        1,
+		IsBonus:       0,
+	}
+
+	if petId, err = models.AddPet(pet); err != nil {
+		beego.BeeLogger.Info("GeneratePet AddPet Error %v need operation manual:Uid %v,Cid %v,Fid %v,Petnam %v,years %v,svgpath %v",
+			err, uid, 0, 0, txhash, years, "svgpath")
+		return
+	}
+
+	if mjValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Minjie].Limit); err != nil {
+		beego.BeeLogger.Error("GeneratePet RandValue Error %v", err)
+		return
+	}
+
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Minjie, years, fmt.Sprintf("%v", mjValue))); err != nil {
+		beego.BeeLogger.Info("GeneratePet AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Minjie, 0, petId, txhash, years)
+		return
+	}
+	if llValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Liliang].Limit); err != nil {
+		beego.BeeLogger.Error("GeneratePet RandValue Error %v", err)
+		return
+	}
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Liliang, years, fmt.Sprintf("%v", llValue))); err != nil {
+		beego.BeeLogger.Info("GeneratePet AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Liliang, 0, petId, txhash, years)
+		return
+	}
+	if zlValue, err = s.RandValue(s.conf.GetMapAttr()[types.Attr_Type_Zhili].Limit); err != nil {
+		beego.BeeLogger.Error("GeneratePet RandValue Error %v", err)
+		return
+	}
+	if _, err = models.AddAttrvalue(models.NewAttrvalue(petId, types.Attr_Type_Zhili, years, fmt.Sprintf("%v", zlValue))); err != nil {
+		beego.BeeLogger.Info("GeneratePet AddAttrvalue Error %v need operation manual:Aid %v ,Cid %v,Fid %v,Petnam %v,years %v",
+			err, types.Attr_Type_Zhili, 0, petId, txhash, years)
+		return
+	}
+	return
 }
 
 func (s *BackServer) JudgeTransaction() (err error) {
@@ -443,7 +537,7 @@ func (s *BackServer) RandValue(attrLimit string) (value float64, err error) {
 func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	//svg head
-	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 800 800\">"
+	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"-100 0 800 800\">"
 
 	//random for panda base color
 	color := generate_rand(7)
@@ -496,12 +590,22 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 		case 1:
 			//use random element
 			//Be or not be
-			rand := generate_rand(int64(100 / percent))
+			if percent > 50 && percent < 100 { // usual items
+				rand_flag := generate_rand(int64(100 / (100 - percent)))
+				if rand_flag == 0 {
+					break
+				}
+			} else { //	unusual	items
+				rand_flag := generate_rand(int64(100 / percent))
+				if rand_flag != 0 {
+					break
+				}
+			}
 
-			if (rand != 0 && percent != 1) || (flag == 1 && percent == 1) {
+			if (percent != 1) || (flag == 1 && percent == 1) {
 				//get count of this item
-				count := models.GetCountByCatagoryId(catagory_id)
-				if count == 0 {
+				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
+				if rand == -1 {
 					break
 				}
 				svg += getSvgDetail(catagory_id, 0, 0, rand)
@@ -524,8 +628,6 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 					}
 					svg += getSvgDetail(catagory_id, 0, 0, rand)
 				}
-			} else {
-				//do nothing
 			}
 			selectflag_times[select_flag]++
 		}

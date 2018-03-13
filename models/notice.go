@@ -12,7 +12,7 @@ type Notice struct {
 }
 
 func (t *Notice) TableName() string {
-	return "Notice"
+	return "notice"
 }
 
 func init() {

@@ -97,6 +97,40 @@ func GetMod(b byte, m byte) (byte, error) {
 	return b % m, nil
 }
 
+func GetChar_Num() (c string) {
+	return string(byte(GetRand(48, 58)))
+}
+func GetChar_Cap() (c string) {
+	return string(byte(GetRand(65, 91)))
+}
+func GetChar_Low() (c string) {
+	return string(byte(GetRand(97, 123)))
+}
+
+func GenCode(n int) (code string) {
+	var (
+		rand int
+		str  string
+	)
+	for i := 0; i < n; i++ {
+		rand = int(GetRand(0, 3))
+		time.Sleep(time.Nanosecond)
+		switch rand {
+		case 0:
+			str += GetChar_Num()
+			continue
+		case 1:
+			str += GetChar_Low()
+			continue
+		case 2:
+			str += GetChar_Cap()
+			continue
+		}
+	}
+	return str
+}
+
+//解析 1_2 格式
 func SplitAndParseToFloat(s string) (small, big float64, err error) {
 
 	arry := strings.Split(s, "_")

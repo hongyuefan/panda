@@ -16,6 +16,9 @@ type Config struct {
 	HostUrl           string  `orm:"column(host_url)"`
 	BonusRatio        float64 `orm:"column(bonus_ratio)"`
 	OwnerPrv          string  `orm:"column(owner_priv)"`
+	InvitationLimit   int     `orm:"column(invitation_limit)"`
+	IsInvitation      int     `orm:"column(is_invitation)"`
+	InvitationYears   int     `orm:"column(invitation_years)"`
 	maptsType         map[int64]*TransType
 	mapattrType       map[int64]*Attribute
 }

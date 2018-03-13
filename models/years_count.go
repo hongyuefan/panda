@@ -48,7 +48,7 @@ func AddYearsCount(years int) (err error) {
 			v := &YearsCount{
 				Id:    years,
 				Count: 1,
-				Limit: 500,
+				Limit: 5000,
 				Range: "0_0",
 			}
 			_, err = o.Insert(v)
