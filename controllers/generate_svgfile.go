@@ -55,8 +55,8 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64) (
 }
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
-	//path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
-	path := c.Generate_svg(0, "c://", "1")
+	path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
+	//path := c.Generate_svg(0, "c://", "1")
 
 	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
 }

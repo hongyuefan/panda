@@ -40,8 +40,9 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 			if err = models.AddInvitation(userId, code); err != nil {
 				goto errDeal
 			}
+		} else {
+			goto errDeal
 		}
-		goto errDeal
 	}
 	if flag == 1 || count >= conf.InvitationLimit {
 		surplus = 0
