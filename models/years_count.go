@@ -23,7 +23,7 @@ func init() {
 
 func GetAllYearsCount() (yearsCounts []*YearsCount, err error) {
 	o := orm.NewOrm()
-	_, err = o.QueryTable(&YearsCount{}).All(yearsCounts)
+	_, err = o.QueryTable(&YearsCount{}).All(&yearsCounts)
 	return
 }
 

@@ -171,7 +171,7 @@ func IsHaveGamblingCount(uid int64) (err error) {
 		return
 	}
 	if v.GamblingNum <= 0 {
-		err = fmt.Errorf("no enough count")
+		err = fmt.Errorf("no enough count to luckdraw")
 	}
 	return
 }
@@ -187,7 +187,7 @@ func SubPlayerGamblingCount(uid int64) (err error) {
 	if v.GamblingNum > 0 {
 		v.GamblingNum -= 1
 	}
-	_, err = o.Update(v, "GamblingNum")
+	_, err = o.Update(&v, "GamblingNum")
 
 	return
 }
