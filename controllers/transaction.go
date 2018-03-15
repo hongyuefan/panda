@@ -217,7 +217,7 @@ func (t *TransactionContoller) CountAllIntrest() (totle_intrest int64, totle_tra
 	query := make(map[string]string)
 
 	for {
-		ml, err := models.GetAllPet(query, []string{"Intrest"}, []string{"id"}, []string{"asc"}, offset, limit)
+		ml, err := models.GetAllPet(query, []string{"Intrest", "TrainTotle"}, []string{"id"}, []string{"asc"}, offset, limit)
 		if err != nil {
 			return 0, 0, err
 		}
