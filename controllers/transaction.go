@@ -207,7 +207,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 
 }
 
-func (t *TransactionContoller) CountAllIntrest() (totle int64, err error) {
+func (t *TransactionContoller) CountAllIntrest() (totle_intrest int64, totle_train float64, err error) {
 
 	var (
 		offset int64 = 0
@@ -219,21 +219,30 @@ func (t *TransactionContoller) CountAllIntrest() (totle int64, err error) {
 	for {
 		ml, err := models.GetAllPet(query, []string{"Intrest"}, []string{"id"}, []string{"asc"}, offset, limit)
 		if err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 		if len(ml) <= 0 {
 			break
 		}
 		for _, v := range ml {
-			totle += v.(map[string]interface{})["Intrest"].(int64)
+			totle_intrest += v.(map[string]interface{})["Intrest"].(int64)
+			totle_train += stringToFloat(v.(map[string]interface{})["TrainTotle"].(string))
 		}
 		offset = +int64(len(ml))
 	}
-	if totle <= 0 {
+	if totle_intrest <= 0 {
 		err = fmt.Errorf("CountAllIntrest Totle is Zero")
 	}
 	return
 
+}
+
+func stringToFloat(s string) (i float64) {
+	var err error
+	if i, err = strconv.ParseFloat(s, 64); err != nil {
+		i = 0
+	}
+	return
 }
 
 func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
@@ -241,19 +250,12 @@ func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
 		offset      int64 = 0
 		limit       int64 = 100
 		totle       int64
-		sbalance    string
 		pub_balance float64
 		txhash      string
 		count       int
 	)
 
-	if sbalance, err = trans.GetBalance(conf.OwnerPub); err != nil {
-		return
-	}
-	if pub_balance, err = strconv.ParseFloat(sbalance, 64); err != nil {
-		return
-	}
-	if totle, err = t.CountAllIntrest(); err != nil {
+	if totle, pub_balance, err = t.CountAllIntrest(); err != nil {
 		return
 	}
 

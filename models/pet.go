@@ -177,8 +177,8 @@ func UpdatePetById(m *Pet, cols ...string) (err error) {
 func BonusOver(pId int64, isSuccess int) (err error) {
 	o := orm.NewOrm()
 	if isSuccess == 1 {
-		v := &Pet{Id: pId, IsBonus: isSuccess, Intrest: 0}
-		_, err = o.Update(v, "IsBonus", "Intrest")
+		v := &Pet{Id: pId, TrainTotle: "0", IsBonus: isSuccess, Intrest: 0}
+		_, err = o.Update(v, "IsBonus", "Intrest", "TrainTotle")
 	} else {
 		v := &Pet{Id: pId, IsBonus: isSuccess}
 		_, err = o.Update(v, "IsBonus")
