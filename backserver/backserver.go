@@ -263,15 +263,15 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 		return
 	}
 
-	mjAttr.Value, mjAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Minjie, st1, mjAttr.Value, amount)
+	mjAttr.Value, mjAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Minjie, st1, mjAttr.Value, amount, float64(s.conf.TrainLimit))
 	if err != nil {
 		return
 	}
-	llAttr.Value, llAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Liliang, st2, llAttr.Value, amount)
+	llAttr.Value, llAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Liliang, st2, llAttr.Value, amount, float64(s.conf.TrainLimit))
 	if err != nil {
 		return
 	}
-	zlAttr.Value, zlAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Zhili, st3, zlAttr.Value, amount)
+	zlAttr.Value, zlAttr.Multi, err = s.trainArithmetic(types.Attr_Type_Zhili, st3, zlAttr.Value, amount, float64(s.conf.TrainLimit))
 	if err != nil {
 		return
 	}
@@ -279,7 +279,7 @@ func (s *BackServer) TrainResult(txhash, amount string, txid, uid, pid int64) {
 	s.upDateAttrValue(llAttr)
 	s.upDateAttrValue(zlAttr)
 
-	if err := models.UpTrainTotleAndIntrest(pid, amount, zlAttr.Value, llAttr.Value, s.conf.RareAttribute); err != nil {
+	if err := models.UpTrainTotleAndIntrest(pid, float64(s.conf.TrainLimit), amount, zlAttr.Value, llAttr.Value, s.conf.RareAttribute); err != nil {
 		beego.BeeLogger.Error("UpTrainTotle error %v,txhash %v Uid %v Amount %v", err, txhash, uid, amount)
 	}
 	return
@@ -305,7 +305,7 @@ func (s *BackServer) getAttr(pid, aid int64) (attr *models.Attrvalue, err error)
 	return
 }
 
-func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount string) (result, strMulti string, err error) {
+func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount string, limitTotle float64) (result, strMulti string, err error) {
 	var (
 		nMulti   float64
 		nBalance float64
@@ -333,7 +333,7 @@ func (s *BackServer) trainArithmetic(ntype int64, state int, balance, amount str
 		return
 	}
 
-	nResult = nBalance + nBalance*nMulti*nAmount/10.0
+	nResult = nBalance + nBalance*nMulti*(nAmount/limitTotle)/10.0
 
 	result = fmt.Sprintf("%v", nResult)
 

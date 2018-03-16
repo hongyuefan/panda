@@ -283,7 +283,7 @@ func IsExistPet(uid, pid int64) (years int, err error) {
 	return
 }
 
-func UpTrainTotleAndIntrest(pid int64, addAmount, zhili, liliang string, rare float64) (err error) {
+func UpTrainTotleAndIntrest(pid int64, limitTotal float64, addAmount, zhili, liliang string, rare float64) (err error) {
 
 	pet, err := GetPetById(pid)
 	if err != nil {
@@ -305,7 +305,7 @@ func UpTrainTotleAndIntrest(pid int64, addAmount, zhili, liliang string, rare fl
 		rare = 0
 	}
 
-	pet.Intrest, err = arithmetic.Benefit(zhili, liliang, float64(Totle), rare, float64(pet.Years))
+	pet.Intrest, err = arithmetic.Benefit(zhili, liliang, float64(Totle), limitTotal, rare, float64(pet.Years))
 
 	pet.TrainTotle = fmt.Sprintf("%v", Totle)
 
