@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-const (
-	Result_Multiple = 1.5
-	Result_Normal   = 1
-)
-
 func CatchResult(hash string, comp string) (result int, err error) {
 
 	comp = strings.Replace(comp, ".", "", -1)
@@ -24,16 +19,16 @@ func CatchResult(hash string, comp string) (result int, err error) {
 		return
 	}
 
-	c1, err := SplitTx_N(comp, 1)
+	c1, err := SplitTx_Trim_N(comp, 1)
 	if err != nil {
 		return
 	}
-	c2, err := SplitTx_N(comp, 2)
+	c2, err := SplitTx_Trim_N(comp, 2)
 	if err != nil {
 		return
 	}
 
-	if c1 > h2 || (c1 == h2 && c2 > h1) {
+	if c2 > h2 || (c2 == h2 && c1 > h1) {
 		result = 1
 	}
 	if c1 == h2 && c2 == h1 {

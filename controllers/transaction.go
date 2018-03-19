@@ -114,10 +114,10 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 		if mPet, err = models.GetPetById(pid); err != nil {
 			return
 		}
-		if result, err = compareAmount(mPet.TrainTotle, fmt.Sprintf("%v", conf.TrainLimit)); err != nil {
+		if result, err = compareAmount(fmt.Sprintf("%v", addAmount(amount, mPet.TrainTotle)), fmt.Sprintf("%v", conf.TrainLimit)); err != nil {
 			return
 		}
-		if result > 0 {
+		if result >= 0 {
 			return "", types.Error_Train_AmountOver
 		}
 		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, amount); err != nil {
@@ -330,14 +330,27 @@ func (t *TransactionContoller) InsertTransQ(uid, pid, buyerId, ntype int64, amou
 	return
 }
 
+func addAmount(amount, balance string) (result float64) {
+	famount, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		return 0
+	}
+	fbalance, err := strconv.ParseFloat(balance, 64)
+	if err != nil {
+		return 0
+	}
+	result = famount + fbalance
+	return
+}
+
 func compareAmount(amount, balance string) (int, error) {
 
-	famount, err := strconv.ParseFloat(amount, 10)
+	famount, err := strconv.ParseFloat(amount, 64)
 	if err != nil {
 		return 0, err
 	}
 
-	fbalance, err := strconv.ParseFloat(balance, 10)
+	fbalance, err := strconv.ParseFloat(balance, 64)
 	if err != nil {
 		return 0, err
 	}
