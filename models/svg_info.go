@@ -18,6 +18,7 @@ type Svg_info struct {
 	N_id        int64  `orm:"column(n_id);"`
 	Base_color  int    `orm:"column(base_color);"`
 	P_id        int64  `orm:"column(p_id);"`
+	Link_id     string `orm:"column(link_id);"`
 }
 
 func (t *Svg_info) TableName() string {

@@ -32,6 +32,16 @@ func AddSvgcata(m *Svg_catagory) (id int64, err error) {
 	return
 }
 
+func GetSvgCatagoryCountByField(field string) (count int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Svg_catagory))
+
+	qs = qs.GroupBy(field)
+
+	return qs.Count()
+}
+
+
 func GetCountBySelectId(select_id int64) (count int64, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Svg_catagory))
