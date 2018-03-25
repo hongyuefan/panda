@@ -15,7 +15,7 @@ import (
 
 func init() {
 
-	beego.Router("/view", &controllers.ViewController{}, "get:Index")
+	beego.Router("/", &controllers.ViewController{}, "get:Index")
 
 	beego.Router("/v1/tsxm/verifycode", &controllers.UserLoginController{}, "post:VerifyUser")
 	beego.Router("/v1/tsxm/regist", &controllers.UserLoginController{}, "post:RegistUser")
