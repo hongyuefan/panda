@@ -127,22 +127,22 @@ func (c *UserLoginController) RegistUser() {
 	}
 	orm = models.NewCommon()
 
-	if err = orm.BeginTx(); err != nil {
-		goto errDeal
-	}
+	//	if err = orm.BeginTx(); err != nil {
+	//		goto errDeal
+	//	}
 
 	if uid, err = orm.CommonInsert(mUser); err != nil {
 		goto errDeal
 	}
 
 	if token, err = TokenGenerate(uid); err != nil {
-		orm.Rollback()
+		//orm.Rollback()
 		goto errDeal
 	}
 
-	if err = orm.Commit(); err != nil {
-		goto errDeal
-	}
+	//	if err = orm.Commit(); err != nil {
+	//		goto errDeal
+	//	}
 	rspRgt = types.RspRegist{
 		RspBase: types.RspBase{
 			MemberIsExist: 0,
@@ -251,7 +251,7 @@ func (c *UserLoginController) UserLogin() {
 		}
 
 		if balance, err = t.GetBalance(mUser.PubPublic); err != nil {
-			goto errDeal
+			balance = "0"
 		}
 
 		rspLogin = types.RspRegist{
@@ -309,7 +309,7 @@ func (c *UserLoginController) UpdatePassWord() {
 
 	email = c.Ctx.Request.FormValue("userName")
 	newPassWord = c.Ctx.Request.FormValue("newPassword")
-	verifyCody = c.Ctx.Request.FormValue("verifyCody")
+	verifyCody = c.Ctx.Request.FormValue("verifyCode")
 
 	if err = ValidatePassWord(newPassWord); err != nil {
 		goto errDeal
