@@ -57,6 +57,16 @@ errDeal:
 	return
 }
 
+func (t *PetController) switchPet(ssort string) string {
+	switch ssort {
+	case "birth":
+		return "CreatTime"
+	case "train_total":
+		return "TrainTotle"
+	}
+	return "id"
+}
+
 func (t *PetController) HandlerGetPets() {
 	var (
 		err                             error
@@ -75,10 +85,7 @@ func (t *PetController) HandlerGetPets() {
 	spage = t.Ctx.Request.FormValue("page")
 	sperpage = t.Ctx.Request.FormValue("perpage")
 	sorder = t.Ctx.Request.FormValue("order")
-	ssort = t.Ctx.Request.FormValue("sort")
-	if ssort == "" {
-		ssort = "id"
-	}
+	ssort = t.switchPet(t.Ctx.Request.FormValue("sort"))
 	sUid = t.Ctx.Request.FormValue("memberId")
 	sPid = t.Ctx.Request.FormValue("petId")
 	sstatus = t.Ctx.Request.FormValue("status")
