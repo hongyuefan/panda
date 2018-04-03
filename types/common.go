@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -11,3 +12,9 @@ var (
 var (
 	Svg_File_Path = "/svg"
 )
+
+type RspCommon struct {
+	Success bool            `json:"success"`
+	Message string          `json:"message"`
+	Data    json.RawMessage `json:"data"`
+}

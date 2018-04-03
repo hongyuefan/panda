@@ -1,15 +1,11 @@
 package types
 
 type RspTransPet struct {
-	Success bool   `json:"success"`
-	TxHash  string `json:"txhash"`
-	Message string `json:"message"`
+	TxHash string `json:"txhash"`
 }
 
 type RspAddOffer struct {
-	Success bool   `json:"success"`
 	OfferId string `json:"offerId"`
-	Message string `json:"message"`
 }
 
 type RspUpdateOffer struct {

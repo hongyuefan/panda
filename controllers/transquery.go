@@ -27,6 +27,7 @@ func (t *TransQContoller) GetTransQ() {
 		query                   map[string]string
 		ml                      []interface{}
 		conf                    models.Config
+		transQ                  types.RspTransQ
 	)
 
 	if err = t.Ctx.Request.ParseForm(); err != nil {
@@ -89,17 +90,13 @@ func (t *TransQContoller) GetTransQ() {
 		data.Status = conf.GetMapType()[v.(models.TransQ).Type].Name + TranstateString(v.(models.TransQ).Status)
 		datas = append(datas, data)
 	}
-	t.HandlerResult(len(ml), datas)
+	transQ = types.RspTransQ{
+		Total: len(datas),
+		Data:  datas,
+	}
+	SuccessHandler(t.Ctx, transQ)
 	return
 errDeal:
 	ErrorHandler(t.Ctx, err)
 	return
-}
-
-func (t *TransQContoller) HandlerResult(total int, datas []types.TransQData) {
-	t.Ctx.Output.JSON(
-		types.RspTransQ{
-			Total: total,
-			Data:  datas,
-		}, false, false)
 }

@@ -18,8 +18,6 @@ type InvitationController struct {
 	beego.Controller
 }
 type RspInvitationCode struct {
-	Success       bool   `json:"success"`
-	Message       string `json:"message"`
 	InvitationUrl string `json:"invitation_url"`
 	Surplus       int    `json:"surplus"`
 	IsReward      int    `json:"isReward"`
@@ -34,6 +32,7 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 		count                    int
 		code, invitationUrl, img string
 		flag                     int
+		rspInvitationCode        RspInvitationCode
 	)
 	conf := GetConfigData()
 
@@ -62,19 +61,17 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 	if img, err = GenQRCode(invitationUrl); err != nil {
 		goto errDeal
 	}
-	c.Ctx.Output.JSON(RspInvitationCode{
-		Success:       true,
+	rspInvitationCode = RspInvitationCode{
 		InvitationUrl: invitationUrl,
 		Surplus:       surplus,
 		IsReward:      flag,
 		Image:         img,
-	}, false, false)
+	}
+
+	SuccessHandler(c.Ctx, rspInvitationCode)
 	return
 errDeal:
-	c.Ctx.Output.JSON(&RspInvitationCode{
-		Success: false,
-		Message: err.Error(),
-	}, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }
 

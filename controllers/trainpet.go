@@ -19,6 +19,7 @@ func (c *TrainController) HandlerTrainPet() {
 		err                     error
 		spetId, sAmount, txhash string
 		petId                   int64
+		result                  types.RspTrain
 	)
 	if userId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal
@@ -36,25 +37,12 @@ func (c *TrainController) HandlerTrainPet() {
 	if txhash, err = c.trans.Transactions(types.Trans_Type_Train, userId, petId, 0, sAmount); err != nil {
 		goto errDeal
 	}
-	c.HandlerResult(true, nil, txhash)
+	result = types.RspTrain{
+		Txhash: txhash,
+	}
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	c.HandlerResult(false, err, "")
-	return
-}
-
-func (c *TrainController) HandlerResult(success bool, err error, hash string) {
-
-	var msg string
-
-	if err != nil {
-		msg = err.Error()
-	}
-	result := &types.RspTrain{
-		Success: success,
-		Message: msg,
-		Txhash:  hash,
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }

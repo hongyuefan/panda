@@ -30,18 +30,11 @@ func (c *GamblingController) HandlerGambling() {
 		goto errDeal
 	}
 	result = &types.RspCatch{
-		Success: true,
-		Message: "",
-		Txhash:  txhash,
+		Txhash: txhash,
 	}
-	c.Ctx.Output.JSON(result, false, false)
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	result = &types.RspCatch{
-		Success: false,
-		Message: err.Error(),
-		Txhash:  "",
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }

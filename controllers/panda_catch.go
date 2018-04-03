@@ -55,19 +55,14 @@ func (c *PandaCatchController) HandlerGetPandaCatch() {
 	}
 
 	result = &types.RspCatchResult{
-		Success: true,
-		CTime:   catch.Createtime,
-		Result:  catch.Result,
+		CTime:  catch.Createtime,
+		Result: catch.Result,
 	}
 
-	c.Ctx.Output.JSON(result, false, false)
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	result = &types.RspCatchResult{
-		Success: false,
-		Message: err.Error(),
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }
 
@@ -78,6 +73,7 @@ func (c *PandaCatchController) HandlerPandaCatch() {
 		err    error
 		txhash string
 		userId int64
+		result types.RspCatch
 	)
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -110,27 +106,14 @@ func (c *PandaCatchController) HandlerPandaCatch() {
 		goto errDeal
 	}
 
-	c.HandlerResult(true, nil, txhash)
+	result = types.RspCatch{
+		Txhash: txhash,
+	}
 
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	c.HandlerResult(false, err, "")
-	return
-}
-
-func (c *PandaCatchController) HandlerResult(success bool, err error, hash string) {
-
-	var msg string
-
-	if err != nil {
-		msg = err.Error()
-	}
-	result := &types.RspCatch{
-		Success: success,
-		Message: msg,
-		Txhash:  hash,
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }
 

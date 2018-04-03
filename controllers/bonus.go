@@ -13,31 +13,19 @@ type BonusController struct {
 
 func (c *BonusController) HandlerBonus() {
 	var (
-		err error
+		err    error
+		result types.RspTrain
 	)
 
 	if _, err = c.trans.Transactions(types.Trans_Type_Bonus, 0, 0, 0, ""); err != nil {
 		goto errDeal
 	}
-	c.HandlerResult(true, nil, "启动分红成功")
+	result = types.RspTrain{
+		Txhash: "",
+	}
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	c.HandlerResult(false, err, "")
-	return
-}
-
-func (c *BonusController) HandlerResult(success bool, err error, hash string) {
-
-	var msg string
-
-	if err != nil {
-		msg = err.Error()
-	}
-	result := &types.RspTrain{
-		Success: success,
-		Message: msg,
-		Txhash:  hash,
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }

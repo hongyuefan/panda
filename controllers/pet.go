@@ -46,11 +46,10 @@ func (t *PetController) HandlerGetPetAttribute() {
 
 		attrValues = append(attrValues, attrValue)
 	}
-
 	petAttr.Pid = fmt.Sprintf("%v", atv.Pid)
 	petAttr.Years = atv.Years
 	petAttr.Attrs = attrValues
-	t.Ctx.Output.JSON(petAttr, false, false)
+	SuccessHandler(t.Ctx, petAttr)
 	return
 errDeal:
 	ErrorHandler(t.Ctx, err)
@@ -130,17 +129,12 @@ func (t *PetController) HandlerGetPets() {
 		arryPets = append(arryPets, onePet)
 
 	}
-	t.HandlerResult(len(ml), arryPets)
+	SuccessHandler(t.Ctx, types.RspGetPets{
+		Total: len(arryPets),
+		Pets:  arryPets,
+	})
 	return
 errDeal:
 	ErrorHandler(t.Ctx, err)
 	return
-}
-
-func (t *PetController) HandlerResult(total int, datas []types.GetPet) {
-	t.Ctx.Output.JSON(
-		types.RspGetPets{
-			Total: total,
-			Pets:  datas,
-		}, false, false)
 }

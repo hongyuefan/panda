@@ -24,7 +24,7 @@ func (c *VerifyController) GenerateCode() {
 	)
 	rspCode.CodeId, rspCode.PngBase64 = VCodeGenerate(60, 240, Cap_Metic_Mod)
 
-	c.Ctx.Output.JSON(rspCode, false, false)
+	SuccessHandler(c.Ctx, rspCode)
 
 	return
 }

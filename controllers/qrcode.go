@@ -18,22 +18,21 @@ type QRCodeController struct {
 }
 
 type RspQRCode struct {
-	Success  bool   `json:"success"`
-	Message  string `json:"message"`
 	PngCode  string `json:"qrcode"`
 	WordCode string `json:"wcode"`
 }
 
 func (q *QRCodeController) GenCode() {
 	var (
-		err     error
-		barcode barcode.Barcode
-		c       *bytes.Buffer
-		code    string
-		prepng  string
-		userId  int64
-		mUser   *models.Player
-		token   string
+		err       error
+		barcode   barcode.Barcode
+		c         *bytes.Buffer
+		code      string
+		prepng    string
+		userId    int64
+		mUser     *models.Player
+		token     string
+		rspQRCode RspQRCode
 	)
 
 	if token, err = ParseToken(q.Ctx.Input.Header("Authorization")); err != nil {
@@ -60,25 +59,13 @@ func (q *QRCodeController) GenCode() {
 
 	code = base64.StdEncoding.EncodeToString(c.Bytes())
 
-	q.HandlerResult(true, prepng+code, mUser.PubPublic, "")
-
-	return
-
-errDeal:
-	q.HandlerResult(false, "", "", err.Error())
-	return
-}
-
-func (q *QRCodeController) HandlerResult(success bool, code, wcode, message string) {
-
-	rspQRCode := RspQRCode{
-		Success:  success,
-		Message:  message,
-		PngCode:  code,
-		WordCode: wcode,
+	rspQRCode = RspQRCode{
+		PngCode:  prepng + code,
+		WordCode: mUser.PubPublic,
 	}
-
-	q.Ctx.Output.JSON(rspQRCode, false, false)
-
+	SuccessHandler(q.Ctx, rspQRCode)
+	return
+errDeal:
+	ErrorHandler(q.Ctx, err)
 	return
 }

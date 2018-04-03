@@ -52,8 +52,6 @@ func (c *UserLoginController) VerifyUser() {
 		rspVerify = types.RspVerifyCode{
 			types.RspBase{
 				MemberIsExist: User_Exist,
-				Success:       true,
-				Message:       types.USER_EXIST,
 			},
 		}
 
@@ -61,14 +59,11 @@ func (c *UserLoginController) VerifyUser() {
 		rspVerify = types.RspVerifyCode{
 			types.RspBase{
 				MemberIsExist: User_Not_Exist,
-				Success:       true,
-				Message:       "",
 			},
 		}
 	}
 
-	c.Ctx.Output.JSON(rspVerify, false, false)
-
+	SuccessHandler(c.Ctx, rspVerify)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
@@ -146,8 +141,6 @@ func (c *UserLoginController) RegistUser() {
 	rspRgt = types.RspRegist{
 		RspBase: types.RspBase{
 			MemberIsExist: 0,
-			Success:       true,
-			Message:       types.USER_REGIST_OK,
 		},
 		Data: types.User{
 			MemberId:      fmt.Sprintf("%v", uid),
@@ -166,8 +159,7 @@ func (c *UserLoginController) RegistUser() {
 	if invitationCode != "" {
 		models.UpdateInvitationCount(invitationCode)
 	}
-
-	c.Ctx.Output.JSON(rspRgt, false, false)
+	SuccessHandler(c.Ctx, rspRgt)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
@@ -257,8 +249,6 @@ func (c *UserLoginController) UserLogin() {
 		rspLogin = types.RspRegist{
 			RspBase: types.RspBase{
 				MemberIsExist: User_Exist,
-				Success:       true,
-				Message:       types.USER_LOGIN_SUCCESS,
 			},
 			Data: types.User{
 				MemberId:      fmt.Sprintf("%v", mUser.Id),
@@ -277,13 +267,11 @@ func (c *UserLoginController) UserLogin() {
 		rspLogin = types.RspRegist{
 			RspBase: types.RspBase{
 				MemberIsExist: User_Not_Exist,
-				Success:       false,
-				Message:       types.USER_LOGIN_FAILED,
 			},
 			Data: types.User{},
 		}
 	}
-	c.Ctx.Output.JSON(rspLogin, false, false)
+	SuccessHandler(c.Ctx, rspLogin)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)

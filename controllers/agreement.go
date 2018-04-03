@@ -45,10 +45,9 @@ func (a *AgreeContoller) GetAgreement() {
 	content.Text = "协议规则"
 	content.Subtages = subContents
 
-	a.Ctx.Output.JSON(content, false, false)
+	SuccessHandler(a.Ctx, content)
 
 	return
-
 errDeal:
 	ErrorHandler(a.Ctx, err)
 	return

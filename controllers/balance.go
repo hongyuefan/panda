@@ -13,17 +13,16 @@ type BalanceConroller struct {
 
 type RspBalance struct {
 	Balance string `json:"balance"`
-	Success bool   `json:"success"`
-	Message string `json:"message"`
 }
 
 func (b *BalanceConroller) GetBalance() {
 	var (
-		userId  int64
-		err     error
-		balance string
-		orm     *models.Common
-		mUser   models.Player
+		userId     int64
+		err        error
+		balance    string
+		orm        *models.Common
+		mUser      models.Player
+		rspBalance RspBalance
 	)
 
 	if userId, err = ParseAndValidToken(b.Ctx.Input.Header("Authorization")); err != nil {
@@ -42,22 +41,13 @@ func (b *BalanceConroller) GetBalance() {
 		goto errDeal
 	}
 
-	b.HandlerResult(balance, true, "")
-	return
-errDeal:
-	b.HandlerResult("0", false, err.Error())
-	return
-}
-
-func (b *BalanceConroller) HandlerResult(balance string, success bool, message string) {
-
-	rspBalance := RspBalance{
+	rspBalance = RspBalance{
 		Balance: balance,
-		Success: success,
-		Message: message,
 	}
 
-	b.Ctx.Output.JSON(rspBalance, false, false)
-
+	SuccessHandler(b.Ctx, rspBalance)
+	return
+errDeal:
+	ErrorHandler(b.Ctx, err)
 	return
 }

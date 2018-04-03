@@ -17,6 +17,7 @@ func (c *WithDrawalController) HandlerWithDrawal() {
 		userId          int64
 		err             error
 		sAmount, txhash string
+		result          types.RspTrain
 	)
 	if userId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal
@@ -29,25 +30,12 @@ func (c *WithDrawalController) HandlerWithDrawal() {
 	if txhash, err = c.trans.Transactions(types.Trans_Type_WithDrawal, userId, 0, 0, sAmount); err != nil {
 		goto errDeal
 	}
-	c.HandlerResult(true, nil, txhash)
+	result = types.RspTrain{
+		Txhash: txhash,
+	}
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	c.HandlerResult(false, err, "")
-	return
-}
-
-func (c *WithDrawalController) HandlerResult(success bool, err error, hash string) {
-
-	var msg string
-
-	if err != nil {
-		msg = err.Error()
-	}
-	result := &types.RspTrain{
-		Success: success,
-		Message: msg,
-		Txhash:  hash,
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }

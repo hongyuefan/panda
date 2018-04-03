@@ -606,7 +606,7 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64, i
 }
 
 /*Generate svg file*/
-func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
+func (c *BackServer) Generate_svg(flag int, basePath string, petID string) (svgPath string) {
 
 	//svg head
 	svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"-100 25 800 800\">"
@@ -679,6 +679,10 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 		case 1:
 			//use random element
 			//Be or not be
+			if percent == 0 {
+				goto platform
+			}
+
 			if percent > 50 && percent < 100 { // usual items
 				rand_flag := generate_rand(int64(100 / (100 - percent)))
 				if rand_flag == 0 {
@@ -691,7 +695,8 @@ func (s *BackServer) Generate_svg(flag int, basePath string, petID string) (svgP
 				}
 			}
 
-			if (percent != 1) || (flag == 1 && percent == 1) {
+		platform:
+			if (percent != 0) || (flag == 1 && percent == 0) {
 				//get count of this item
 				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
 				if rand == -1 {

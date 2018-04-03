@@ -10,9 +10,10 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/astaxie/beego"
 	"strconv"
 	"strings"
+
+	"github.com/astaxie/beego"
 )
 
 type GeneratesvgfileController struct {
@@ -31,7 +32,7 @@ func generate_rand(number int64) (nRand int64) {
 }
 
 /*Get svg_dtl from svg_info by s_id*/
-func getSvgDetailBySId(s_id int64) (svg_detail string){
+func getSvgDetailBySId(s_id int64) (svg_detail string) {
 	query := make(map[string]string, 0)
 	query["s_id"] = fmt.Sprintf("%v", s_id)
 	resultl, _ := models.GetAllSvginfo(query, []string{}, []string{}, []string{}, 0, 1)
@@ -49,7 +50,7 @@ func getSvgDetailBySId(s_id int64) (svg_detail string){
 func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64, ids []int64) (s_id int64, svg_detail string) {
 	link_flag := 0
 	svg_detail = ""
-	
+
 	query := make(map[string]string, 0)
 	if color_flag == 1 {
 		query["base_color"] = fmt.Sprintf("%v", color)
@@ -61,11 +62,11 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64, i
 	for _, v := range resultl {
 		s_id = v.(models.Svg_info).S_id
 		// This item can be used only "Link_id item" exists.
-		if v.(models.Svg_info).Link_id != "" { 
+		if v.(models.Svg_info).Link_id != "" {
 			for _, id := range ids {
-				for _, vlink_id := range strings.Split(v.(models.Svg_info).Link_id, ","){
+				for _, vlink_id := range strings.Split(v.(models.Svg_info).Link_id, ",") {
 					link_id, err := strconv.Atoi(vlink_id)
-					if err != nil{
+					if err != nil {
 						fmt.Println("ATOI Failed")
 					}
 					if id == int64(link_id) { // MATCH! CAN BE USE
@@ -105,19 +106,18 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 
 	//random for panda base color
 	color := generate_rand(7)
-	
+
 	// ids
 	cg_count, err0 := models.GetSvgCatagoryCountByField("id")
-	if err0 != nil	{
+	if err0 != nil {
 		fmt.Println(err0)
 	}
 	// memset
 	var ids = make([]int64, cg_count, 20)
-	
-	
+
 	// Svg Select_flag count
 	cg_count_sf, err1 := models.GetSvgCatagoryCountByField("Select_flag")
-	if err1 != nil	{
+	if err1 != nil {
 		fmt.Println(err1)
 	}
 	// memset
@@ -156,7 +156,7 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 					break
 				}
 				_id, _svg := getSvgDetail(catagory_id, 1, color, rand, ids)
-				ids[i] = _id;
+				ids[i] = _id
 				svg += _svg
 			} else {
 				// bodyline, mouth
@@ -165,13 +165,17 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 					break
 				}
 				_id, _svg := getSvgDetail(catagory_id, 0, 0, rand, ids)
-				ids[i] = _id;
+				ids[i] = _id
 				svg += _svg
 			}
 
 		case 1:
 			//use random element
 			//Be or not be
+			if percent == 0 {
+				goto platform
+			}
+
 			if percent > 50 && percent < 100 { // usual items
 				rand_flag := generate_rand(int64(100 / (100 - percent)))
 				if rand_flag == 0 {
@@ -184,14 +188,15 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 				}
 			}
 
-			if (percent != 1) || (flag == 1 && percent == 1) {
+		platform:
+			if (percent != 0) || (flag == 1 && percent == 0) {
 				//get count of this item
 				rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
 				if rand == -1 {
 					break
 				}
 				_id, _svg := getSvgDetail(catagory_id, 0, 0, rand, ids)
-				ids[i] = _id;
+				ids[i] = _id
 				svg += _svg
 			}
 
@@ -205,7 +210,7 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 						break
 					}
 					_id, _svg := getSvgDetail(catagory_id, 1, color, rand, ids)
-					ids[i] = _id;
+					ids[i] = _id
 					svg += _svg
 				} else { // hat && front_hair
 					rand := generate_rand(models.GetCountByCatagoryId(catagory_id))
@@ -213,7 +218,7 @@ func (c *GeneratesvgfileController) Generate_svg(flag int, basePath string, petI
 						break
 					}
 					_id, _svg := getSvgDetail(catagory_id, 0, 0, rand, ids)
-					ids[i] = _id;
+					ids[i] = _id
 					svg += _svg
 				}
 			}

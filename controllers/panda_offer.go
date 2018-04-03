@@ -102,6 +102,7 @@ func (c *OfferController) HandlerGetOffer() {
 		arryOffers                     []types.GetOffers
 		offer                          types.GetOffers
 		ml                             []interface{}
+		respOffers                     types.RspGetOffers
 	)
 
 	if err = c.Ctx.Request.ParseForm(); err != nil {
@@ -154,19 +155,16 @@ func (c *OfferController) HandlerGetOffer() {
 		arryOffers = append(arryOffers, offer)
 	}
 
-	c.HandlerGetOfferResult(len(ml), arryOffers)
+	respOffers = types.RspGetOffers{
+		Total:  len(arryOffers),
+		Offers: arryOffers,
+	}
+
+	SuccessHandler(c.Ctx, respOffers)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
 	return
-}
-
-func (c *OfferController) HandlerGetOfferResult(total int, offers []types.GetOffers) {
-	respOffers := &types.RspGetOffers{
-		Total:  total,
-		Offers: offers,
-	}
-	c.Ctx.Output.JSON(respOffers, false, false)
 }
 
 func (c *OfferController) HandlerBuyPet() {
@@ -201,17 +199,12 @@ func (c *OfferController) HandlerBuyPet() {
 		goto errDeal
 	}
 	rspTransPet = types.RspTransPet{
-		Success: true,
-		TxHash:  txhash,
+		TxHash: txhash,
 	}
-	c.Ctx.Output.JSON(rspTransPet, false, false)
+	SuccessHandler(c.Ctx, rspTransPet)
 	return
 errDeal:
-	rspTransPet = types.RspTransPet{
-		Success: false,
-		Message: err.Error(),
-	}
-	c.Ctx.Output.JSON(rspTransPet, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }
 
@@ -221,6 +214,7 @@ func (c *OfferController) HandlerDoOffer() {
 		spetId, sprice         string
 		years                  int
 		err                    error
+		result                 types.RspAddOffer
 	)
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -253,26 +247,12 @@ func (c *OfferController) HandlerDoOffer() {
 		goto errDeal
 	}
 
-	c.HandlerDoOfferResult(true, nil, offerId)
-
+	result = types.RspAddOffer{
+		OfferId: fmt.Sprintf("%v", offerId),
+	}
+	SuccessHandler(c.Ctx, result)
 	return
 errDeal:
-	c.HandlerDoOfferResult(false, err, 0)
-	return
-}
-
-func (c *OfferController) HandlerDoOfferResult(success bool, err error, id int64) {
-
-	var msg string
-
-	if err != nil {
-		msg = err.Error()
-	}
-	result := &types.RspAddOffer{
-		Success: success,
-		Message: msg,
-		OfferId: fmt.Sprintf("%v", id),
-	}
-	c.Ctx.Output.JSON(result, false, false)
+	ErrorHandler(c.Ctx, err)
 	return
 }

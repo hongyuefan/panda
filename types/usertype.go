@@ -26,9 +26,7 @@ type ReqVerifyCode struct {
 }
 
 type RspBase struct {
-	MemberIsExist uint8  `json:"memberIsExist"`
-	Success       bool   `json:"success"`
-	Message       string `json:"message"`
+	MemberIsExist uint8 `json:"memberIsExist"`
 }
 
 type RspVerifyCode struct {
@@ -45,7 +43,7 @@ type ReqRegist struct {
 
 type RspRegist struct {
 	RspBase
-	Data User `json:"data"`
+	Data User `json:"info"`
 }
 
 type ReqLogin struct {
