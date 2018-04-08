@@ -23,5 +23,5 @@ func main() {
 
 	beego.SetStaticPath(types.Svg_File_Path, beego.AppConfig.String("svg_path"))
 
-	beego.Run(beego.AppConfig.String("httpport"))
+	beego.Run()
 }
