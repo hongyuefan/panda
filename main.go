@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root:350999@tcp(47.92.67.93:3306)/panda")
+	orm.RegisterDataBase("default", "mysql", "root:350999@tcp(localhost:3306)/panda")
 }
 
 func main() {
@@ -23,5 +23,5 @@ func main() {
 
 	beego.SetStaticPath(types.Svg_File_Path, beego.AppConfig.String("svg_path"))
 
-	beego.Run(":8080")
+	beego.Run(beego.AppConfig.String("httpport"))
 }

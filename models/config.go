@@ -19,8 +19,12 @@ type Config struct {
 	InvitationLimit   int     `orm:"column(invitation_limit)"`
 	IsInvitation      int     `orm:"column(is_invitation)"`
 	InvitationYears   int     `orm:"column(invitation_years)"`
-	maptsType         map[int64]*TransType
-	mapattrType       map[int64]*Attribute
+	AppId             string  `orm:"column(app_id)"`
+	AppKey            string  `orm:"column(app_key)"`
+	TplId             int     `orm:"column(tpl_id)"`
+
+	maptsType   map[int64]*TransType
+	mapattrType map[int64]*Attribute
 }
 
 func (t *Config) TableName() string {

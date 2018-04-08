@@ -40,6 +40,9 @@ func SetConfigData(conf *models.Config, mtx map[int64]*models.TransType, mat map
 	configData.IsInvitation = conf.IsInvitation
 	configData.InvitationLimit = conf.InvitationLimit
 	configData.InvitationYears = conf.InvitationYears
+	configData.AppId = conf.AppId
+	configData.AppKey = conf.AppKey
+	configData.TplId = conf.TplId
 	configData.SetMapType(mtx)
 	configData.SetMapAttr(mat)
 }

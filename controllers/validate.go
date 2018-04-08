@@ -5,6 +5,20 @@ import (
 	"strings"
 )
 
+const (
+	Len_Mobile = 11
+)
+
+func ValidMobile(mobile string) (err error) {
+	if len(mobile) != Len_Mobile {
+		return errors.New("mobile length not enough")
+	}
+	if !strings.HasPrefix(mobile, "1") {
+		return errors.New("mobile form not right")
+	}
+	return
+}
+
 func ValidateEmail(userName string) (err error) {
 	if len(userName) < 2 {
 		err = errors.New("username length not enough")
