@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"panda/models"
+	"panda/types"
 
 	"math/rand"
 	"time"
@@ -92,10 +93,13 @@ func getSvgDetail(catagory_id int64, color_flag int, color int64, index int64, i
 }
 
 func (c *GeneratesvgfileController) HandlerGenerate() {
-	path := c.Generate_svg(1, "/root/gocode/src/panda/svgfile/", "1")
+
+	conf := GetConfigData()
+
+	path := c.Generate_svg(1, beego.AppConfig.String("svg_path"), "1")
 	//path := c.Generate_svg(0, "c://", "1")
 
-	c.Ctx.WriteString("http://47.92.67.93:8080/svg/" + path)
+	c.Ctx.WriteString(conf.HostUrl + types.Svg_File_Path + "/" + path)
 }
 
 /*Generate svg file*/
