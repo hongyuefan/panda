@@ -17,7 +17,7 @@ type GetPet struct {
 }
 type RspGetPets struct {
 	Total int      `json:"total"`
-	Pets  []GetPet `json:"data"`
+	Pets  []GetPet `json:"info"`
 }
 
 type GetPetAttr struct {
