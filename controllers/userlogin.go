@@ -278,6 +278,59 @@ errDeal:
 	return
 }
 
+func (c *UserLoginController) UploadPic() {
+	type RspUpload struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+	var (
+		err         error
+		base64Pic   string
+		mUser       *models.Player
+		orm         *models.Common
+		conf        models.Config
+		strFileName string
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	if mUser.Id, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+
+	conf = GetConfigData()
+
+	base64Pic = c.Ctx.Request.FormValue("base64")
+
+	if err = WriteToFile(beego.AppConfig.String("pic_path")+fmt.Sprintf("%v.jpg", mUser.Id), base64Pic); err != nil {
+		goto errDeal
+	}
+
+	strFileName = conf.HostUrl + types.Pic_File_Path + "/" + fmt.Sprintf("%v.jpg", mUser.Id)
+
+	orm = models.NewCommon()
+
+	mUser.Avatar = strFileName
+
+	if _, err = orm.CommonUpdateById(&mUser, "avatar"); err != nil {
+		goto errDeal
+	}
+
+	c.Ctx.Output.JSON(RspUpload{
+		Success: true,
+		Message: "upload pic success",
+	}, false, false)
+
+	return
+errDeal:
+	c.Ctx.Output.JSON(RspUpload{
+		Success: false,
+		Message: err.Error(),
+	}, false, false)
+	return
+}
+
 func (c *UserLoginController) UpdatePassWord() {
 	type RspPass struct {
 		Success bool   `json:"success"`

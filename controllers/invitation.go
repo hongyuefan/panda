@@ -34,7 +34,12 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 		flag                     int
 		rspInvitationCode        RspInvitationCode
 	)
+
 	conf := GetConfigData()
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
 
 	if userId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal

@@ -22,6 +22,7 @@ func main() {
 	}
 
 	beego.SetStaticPath(types.Svg_File_Path, beego.AppConfig.String("svg_path"))
+	beego.SetStaticPath(types.Pic_File_Path, beego.AppConfig.String("pic_path"))
 
 	beego.Run()
 }

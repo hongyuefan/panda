@@ -11,6 +11,7 @@ var (
 
 var (
 	Svg_File_Path = "/svg"
+	Pic_File_Path = "/pic"
 )
 
 type RspCommon struct {

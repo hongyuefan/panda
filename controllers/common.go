@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bufio"
 	"errors"
+	"os"
 	"panda/types"
 	"strings"
 )
@@ -35,4 +37,26 @@ func TranstateString(status int) string {
 		return "交易成功"
 	}
 	return "unknown status "
+}
+
+func WriteToFile(filePath, data string) (err error) {
+
+	os.Remove(filePath)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+
+	w := bufio.NewWriter(f)
+
+	if _, err = w.WriteString(data); err != nil {
+		return err
+	}
+
+	w.Flush()
+
+	f.Close()
+
+	return
 }
