@@ -286,7 +286,7 @@ func (c *UserLoginController) UploadPic() {
 	var (
 		err         error
 		base64Pic   string
-		mUser       *models.Player
+		mUser       models.Player
 		orm         *models.Common
 		conf        models.Config
 		strFileName string
