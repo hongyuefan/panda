@@ -39,7 +39,7 @@ func TranstateString(status int) string {
 	return "unknown status "
 }
 
-func WriteToFile(filePath, data string) (err error) {
+func WriteToFile(filePath string, data []byte) (err error) {
 
 	os.Remove(filePath)
 
@@ -50,7 +50,7 @@ func WriteToFile(filePath, data string) (err error) {
 
 	w := bufio.NewWriter(f)
 
-	if _, err = w.WriteString(data); err != nil {
+	if _, err = w.Write(data); err != nil {
 		return err
 	}
 

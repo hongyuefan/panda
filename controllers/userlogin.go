@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"panda/models"
 	t "panda/transaction"
 	"panda/types"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -290,7 +292,10 @@ func (c *UserLoginController) UploadPic() {
 		orm         *models.Common
 		conf        models.Config
 		strFileName string
+		bytFile     []byte
 	)
+	prepng := "data:image/png;base64,"
+
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
@@ -303,7 +308,13 @@ func (c *UserLoginController) UploadPic() {
 
 	base64Pic = c.Ctx.Request.FormValue("base64")
 
-	if err = WriteToFile(beego.AppConfig.String("pic_path")+fmt.Sprintf("%v.jpg", mUser.Id), base64Pic); err != nil {
+	base64Pic = strings.TrimPrefix(base64Pic, prepng)
+
+	if bytFile, err = base64.StdEncoding.DecodeString(base64Pic); err != nil {
+		goto errDeal
+	}
+
+	if err = WriteToFile(beego.AppConfig.String("pic_path")+fmt.Sprintf("%v.jpg", mUser.Id), bytFile); err != nil {
 		goto errDeal
 	}
 
