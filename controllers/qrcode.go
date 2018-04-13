@@ -25,7 +25,7 @@ type RspQRCode struct {
 func (q *QRCodeController) GenCode() {
 	var (
 		err       error
-		barcode   barcode.Barcode
+		sbarcode  barcode.Barcode
 		c         *bytes.Buffer
 		code      string
 		prepng    string
@@ -48,12 +48,17 @@ func (q *QRCodeController) GenCode() {
 
 	prepng = "data:image/png;base64,"
 
-	if barcode, err = qr.Encode(mUser.PubPublic, qr.L, qr.Unicode); err != nil {
+	if sbarcode, err = qr.Encode(mUser.PubPublic, qr.L, qr.Unicode); err != nil {
 		goto errDeal
 	}
+
+	if sbarcode, err = barcode.Scale(sbarcode, 300, 300); err != nil {
+		goto errDeal
+	}
+
 	c = new(bytes.Buffer)
 
-	if err = png.Encode(c, barcode); err != nil {
+	if err = png.Encode(c, sbarcode); err != nil {
 		goto errDeal
 	}
 
