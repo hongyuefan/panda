@@ -63,7 +63,7 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 
 	invitationUrl = conf.HostUrl + "/v1/tsxm/regist?code=" + code
 
-	if img, err = GenQRCode(invitationUrl); err != nil {
+	if img, err = GenQRCode(invitationUrl, 300, 300); err != nil {
 		goto errDeal
 	}
 	rspInvitationCode = RspInvitationCode{
@@ -80,18 +80,23 @@ errDeal:
 	return
 }
 
-func GenQRCode(code string) (encode string, err error) {
+func GenQRCode(code string, width, height int) (encode string, err error) {
 
-	var barcode barcode.Barcode
+	var sbarcode barcode.Barcode
 
 	prepng := "data:image/png;base64,"
 
-	if barcode, err = qr.Encode(code, qr.L, qr.Unicode); err != nil {
+	if sbarcode, err = qr.Encode(code, qr.L, qr.Unicode); err != nil {
 		return
 	}
+
+	if sbarcode, err = barcode.Scale(sbarcode, width, height); err != nil {
+		return
+	}
+
 	c := new(bytes.Buffer)
 
-	if err = png.Encode(c, barcode); err != nil {
+	if err = png.Encode(c, sbarcode); err != nil {
 		return
 	}
 
