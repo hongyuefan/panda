@@ -294,7 +294,8 @@ func (c *UserLoginController) UploadPic() {
 		strFileName string
 		bytFile     []byte
 	)
-	prepng := "data:image/png;base64,"
+
+	subStr := "base64,"
 
 	if err = c.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
@@ -308,7 +309,7 @@ func (c *UserLoginController) UploadPic() {
 
 	base64Pic = c.Ctx.Request.FormValue("base64")
 
-	base64Pic = strings.TrimPrefix(base64Pic, prepng)
+	base64Pic = base64Pic[strings.Index(base64Pic, subStr)+len(subStr):]
 
 	if bytFile, err = base64.StdEncoding.DecodeString(base64Pic); err != nil {
 		goto errDeal
