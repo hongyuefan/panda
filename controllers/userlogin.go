@@ -311,7 +311,7 @@ func (c *UserLoginController) UploadPic() {
 
 	base64Pic = base64Pic[strings.Index(base64Pic, subStr)+len(subStr):]
 
-	if len(base64Pic) > 2100 {
+	if len(base64Pic) > 210000 {
 		err = fmt.Errorf("file is to large")
 		goto errDeal
 	}
