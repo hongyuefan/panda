@@ -307,7 +307,7 @@ func (c *UserLoginController) UploadPic() {
 
 	conf = GetConfigData()
 
-	base64Pic = c.Ctx.Request.FormValue("base64")
+	base64Pic = c.Ctx.Request.FormValue("avatar")
 
 	base64Pic = base64Pic[strings.Index(base64Pic, subStr)+len(subStr):]
 
