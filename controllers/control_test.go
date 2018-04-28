@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -13,6 +14,13 @@ func TestVCodeGenerate(t *testing.T) {
 	t.Log(VCodeValidate(id, "8"))
 
 	return
+}
+
+func TestStrings(t *testing.T) {
+
+	str := strings.TrimLeft("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QDK", "base64,")
+
+	t.Log(str)
 }
 
 func TestParseToken(t *testing.T) {
