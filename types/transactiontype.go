@@ -6,7 +6,7 @@ import (
 
 type RspTransQ struct {
 	Total int          `json:"total"`
-	Data  []TransQData `json:"data"`
+	Data  []TransQData `json:"info"`
 }
 
 var (

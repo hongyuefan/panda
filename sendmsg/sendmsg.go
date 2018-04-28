@@ -90,7 +90,7 @@ func MsgPostReq(appId, sRand string, reqMsg ReqMsg) (err error) {
 
 	var rspMsg RspMsg
 
-	if err = json.Unmarshal(buffer.Bytes(), rspMsg); err != nil {
+	if err = json.Unmarshal(buffer.Bytes(), &rspMsg); err != nil {
 		return
 	}
 

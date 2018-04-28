@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"panda/arithmetic"
 	"panda/models"
 	"panda/sendmsg"
@@ -50,13 +51,20 @@ func (c *MsgController) SendMsgCode() {
 		conf     models.Config
 		params   []string
 	)
+	codeId := c.GetString("codeId")
+	verifyValue := c.GetString("verifyValue")
 	mobile := c.GetString("mobile")
 	nation := c.GetString("nation")
 	if nation == "" {
-		nation = "+86"
+		nation = "86"
 	}
 
 	if err = ValidMobile(mobile); err != nil {
+		goto errDeal
+	}
+
+	if !VCodeValidate(codeId, verifyValue) {
+		err = fmt.Errorf("picture validate failed")
 		goto errDeal
 	}
 
