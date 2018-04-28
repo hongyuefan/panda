@@ -18,13 +18,13 @@ type Data struct {
 
 func TestSigMsg(t *testing.T) {
 
-	t.Log(SigMsg("15600199768", "8bd9c73577e97decf4772defa48d1066", "2356", "1678945"))
+	t.Log(SigMsg("", "", "2356", "1678945"))
 
 }
 
 func TestSendMsg(t *testing.T) {
 
-	if err := SendMsg("1400081071", "8bd9c73577e97decf4772defa48d1066", "86", "15600199768", []string{"2345"}, 102918); err != nil {
+	if err := SendMsg("", "", "86", "", []string{"2345"}); err != nil {
 		t.Log(err)
 	}
 
