@@ -5,7 +5,7 @@ import (
 )
 
 type RspTransQ struct {
-	Total int          `json:"total"`
+	Total int64        `json:"total"`
 	Data  []TransQData `json:"info"`
 }
 

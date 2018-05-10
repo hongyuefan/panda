@@ -16,7 +16,7 @@ type GetPet struct {
 	IsRare        int    `json:"rare"`
 }
 type RspGetPets struct {
-	Total int      `json:"total"`
+	Total int64    `json:"total"`
 	Pets  []GetPet `json:"info"`
 }
 

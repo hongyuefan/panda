@@ -97,7 +97,7 @@ func (c *OfferController) HandlerGetOffer() {
 		sPetId, sUid, sStatus          string
 		spage, sperpage, sorder, ssort string
 		err                            error
-		page, perpage                  int64
+		page, perpage, total           int64
 		query                          map[string]string
 		arryOffers                     []types.GetOffers
 		offer                          types.GetOffers
@@ -138,7 +138,7 @@ func (c *OfferController) HandlerGetOffer() {
 		goto errDeal
 	}
 
-	if ml, err = models.GetAllOffer(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
+	if ml, total, err = models.GetAllOffer(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
 		goto errDeal
 	}
 

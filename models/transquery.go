@@ -49,7 +49,7 @@ func UpdateTransById(m *TransQ, cols ...string) (err error) {
 	return
 }
 
-func GetTrans(query map[string]string, fields []string, sortby []string, order []string, offset int64, limit int64) (ml []interface{}, err error) {
+func GetTrans(query map[string]string, fields []string, sortby []string, order []string, offset int64, limit int64) (ml []interface{}, total int64, err error) {
 
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(TransQ))
@@ -75,7 +75,7 @@ func GetTrans(query map[string]string, fields []string, sortby []string, order [
 				} else if order[i] == "asc" {
 					orderby = v
 				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
+					return nil, 0, errors.New("Error: Invalid order. Must be either [asc|desc]")
 				}
 				sortFields = append(sortFields, orderby)
 			}
@@ -89,21 +89,24 @@ func GetTrans(query map[string]string, fields []string, sortby []string, order [
 				} else if order[0] == "asc" {
 					orderby = v
 				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
+					return nil, 0, errors.New("Error: Invalid order. Must be either [asc|desc]")
 				}
 				sortFields = append(sortFields, orderby)
 			}
 		} else if len(sortby) != len(order) && len(order) != 1 {
-			return nil, errors.New("Error: 'sortby', 'order' sizes mismatch or 'order' size is not 1")
+			return nil, 0, errors.New("Error: 'sortby', 'order' sizes mismatch or 'order' size is not 1")
 		}
 	} else {
 		if len(order) != 0 {
-			return nil, errors.New("Error: unused 'order' fields")
+			return nil, 0, errors.New("Error: unused 'order' fields")
 		}
 	}
 
 	var l []TransQ
 	qs = qs.OrderBy(sortFields...)
+
+	total, _ = qs.Count()
+
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
@@ -120,7 +123,7 @@ func GetTrans(query map[string]string, fields []string, sortby []string, order [
 				ml = append(ml, m)
 			}
 		}
-		return ml, nil
+		return ml, total, nil
 	}
-	return nil, err
+	return nil, 0, err
 }

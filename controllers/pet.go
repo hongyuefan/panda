@@ -71,7 +71,7 @@ func (t *PetController) HandlerGetPets() {
 		err                             error
 		spage, sperpage, ssort, sstatus string
 		sPid, sUid, sorder              string
-		page, perpage                   int64
+		page, perpage, total            int64
 		query                           map[string]string
 		ml                              []interface{}
 		arryPets                        []types.GetPet
@@ -108,7 +108,7 @@ func (t *PetController) HandlerGetPets() {
 		query["status"] = sstatus
 	}
 
-	if ml, err = models.GetAllPet(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
+	if ml, total, err = models.GetAllPet(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
 		goto errDeal
 	}
 	for _, v := range ml {
@@ -130,7 +130,7 @@ func (t *PetController) HandlerGetPets() {
 
 	}
 	SuccessHandler(t.Ctx, types.RspGetPets{
-		Total: len(arryPets),
+		Total: total,
 		Pets:  arryPets,
 	})
 	return

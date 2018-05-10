@@ -23,7 +23,7 @@ func (t *TransQContoller) GetTransQ() {
 		spage, sorder, stype    string
 		ssort, sperpage, txhash string
 		status, spetId          string
-		page, perpage           int64
+		page, perpage, total    int64
 		query                   map[string]string
 		ml                      []interface{}
 		conf                    models.Config
@@ -73,7 +73,7 @@ func (t *TransQContoller) GetTransQ() {
 		goto errDeal
 	}
 
-	if ml, err = models.GetTrans(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
+	if ml, total, err = models.GetTrans(query, []string{}, []string{ssort}, []string{sorder}, page*perpage, perpage); err != nil {
 		goto errDeal
 	}
 
@@ -91,7 +91,7 @@ func (t *TransQContoller) GetTransQ() {
 		datas = append(datas, data)
 	}
 	transQ = types.RspTransQ{
-		Total: len(datas),
+		Total: total,
 		Data:  datas,
 	}
 	SuccessHandler(t.Ctx, transQ)
