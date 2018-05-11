@@ -11,6 +11,12 @@ type NoticeController struct {
 	beego.Controller
 }
 
+type RspNotice struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    Notice `json:"data"`
+}
+
 type Notice struct {
 	Text string `json:"text"`
 }
@@ -35,13 +41,22 @@ func (c *NoticeController) HandlerNotice() {
 	if notice, err = models.GetNoticPub(); err != nil {
 		goto errDeal
 	}
-	c.Ctx.Output.JSON(&Notice{
-		Text: notice,
-	}, false, false)
+	c.Ctx.Output.JSON(
+		RspNotice{
+			Success: true,
+			Message: "success",
+			Data: Notice{
+				Text: notice,
+			},
+		}, false, false)
 	return
 errDeal:
-	c.Ctx.Output.JSON(&Notice{
-		Text: err.Error(),
+	c.Ctx.Output.JSON(RspNotice{
+		Success: true,
+		Message: "success",
+		Data: Notice{
+			Text: err.Error(),
+		},
 	}, false, false)
 	return
 }

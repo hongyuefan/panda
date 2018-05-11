@@ -26,23 +26,41 @@ func (a *AgreeContoller) GetAgreement() {
 		content     Content
 		subContents []SubContent
 		sub         SubContent
+		result      []interface{}
+		types       string
+		err         error
 	)
 
 	query := make(map[string]string)
 
-	result, err := models.GetAllAgree(query, []string{}, []string{"id"}, []string{"asc"}, 0, 100)
-	if err != nil {
+	if err = a.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	types = a.Ctx.Request.FormValue("type")
+
+	query["stype"] = types
+
+	if result, err = models.GetAllAgree(query, []string{}, []string{"id"}, []string{"asc"}, 0, 1000); err != nil {
 		goto errDeal
 	}
 
 	for _, v := range result {
 		sub.Text = v.(models.Agree).Title
+
 		sub.Standard = v.(models.Agree).Content
 
 		subContents = append(subContents, sub)
 	}
 
-	content.Text = "协议规则"
+	switch types {
+	case "help":
+		content.Text = "帮助中心"
+	case "luckdraw":
+		content.Text = "抽奖协议"
+	case "regist":
+		content.Text = "注册协议"
+	}
 	content.Subtages = subContents
 
 	SuccessHandler(a.Ctx, content)

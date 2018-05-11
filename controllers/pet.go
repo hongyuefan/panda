@@ -49,10 +49,62 @@ func (t *PetController) HandlerGetPetAttribute() {
 	petAttr.Pid = fmt.Sprintf("%v", atv.Pid)
 	petAttr.Years = atv.Years
 	petAttr.Attrs = attrValues
+
+	petAttr.Parent, _ = t.getPetParent(petId)
+	petAttr.Child, _ = t.getPetChild(petId)
+
 	SuccessHandler(t.Ctx, petAttr)
 	return
 errDeal:
 	ErrorHandler(t.Ctx, err)
+	return
+}
+
+func (t *PetController) getPetParent(pid int64) (parent []types.SimplePet, err error) {
+
+	var one types.SimplePet
+
+	pet, err := models.GetPetById(pid)
+	if err != nil {
+		return
+	}
+	if pet.Fid <= 0 {
+		return
+	}
+	spet, err := models.GetPetById(pet.Fid)
+	if err != nil {
+		return
+	}
+	one.Id = fmt.Sprintf("%v", spet.Id)
+	one.Name = spet.Petname
+
+	parent = append(parent, one)
+
+	return
+
+}
+
+func (t *PetController) getPetChild(pid int64) (child []types.SimplePet, err error) {
+
+	var (
+		query map[string]string
+		one   types.SimplePet
+	)
+
+	query = make(map[string]string, 0)
+
+	query["fid"] = fmt.Sprintf("%v", pid)
+
+	ml, _, err := models.GetAllPet(query, []string{}, []string{"id"}, []string{"desc"}, 0, 10)
+	if err != nil {
+		return
+	}
+	for _, v := range ml {
+		one.Id = fmt.Sprintf("%v", v.(models.Pet).Id)
+		one.Name = v.(models.Pet).Petname
+
+		child = append(child, one)
+	}
 	return
 }
 

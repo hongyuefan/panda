@@ -156,7 +156,7 @@ func (c *OfferController) HandlerGetOffer() {
 	}
 
 	respOffers = types.RspGetOffers{
-		Total:  len(arryOffers),
+		Total:  total,
 		Offers: arryOffers,
 	}
 

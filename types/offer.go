@@ -23,6 +23,6 @@ type GetOffers struct {
 	UpdateTime int64  `json:"update_time"`
 }
 type RspGetOffers struct {
-	Total  int         `json:"total"`
+	Total  int64       `json:"total"`
 	Offers []GetOffers `json:"offers"`
 }

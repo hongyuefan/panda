@@ -12,6 +12,7 @@ type Agree struct {
 	Id      int    `orm:"column(id);auto"`
 	Title   string `orm:"column(title);size(128)"`
 	Content string `orm:"column(content);size(512)"`
+	Stype   string `orm:"column(stype);size(64)"`
 }
 
 func init() {

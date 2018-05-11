@@ -24,8 +24,16 @@ type GetPetAttr struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
+
+type SimplePet struct {
+	Id   string `json:"number"`
+	Name string `json:"name"`
+}
+
 type RspGetPetAttr struct {
-	Pid   string       `json:"number"`
-	Years int          `json:"years"`
-	Attrs []GetPetAttr `json:"attributes"`
+	Pid    string       `json:"number"`
+	Years  int          `json:"years"`
+	Attrs  []GetPetAttr `json:"attributes"`
+	Child  []SimplePet  `json:"children"`
+	Parent []SimplePet  `json:"parent"`
 }
