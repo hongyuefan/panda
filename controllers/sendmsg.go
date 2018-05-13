@@ -27,7 +27,7 @@ func (c *MsgController) ValidateMsgCode() {
 	}
 	rspEmail = types.RspEmail{
 		Success: true,
-		Message: "validate code success",
+		Message: "短信验证成功",
 	}
 
 	c.Ctx.Output.JSON(rspEmail, false, false)
@@ -36,7 +36,7 @@ func (c *MsgController) ValidateMsgCode() {
 errDeal:
 	rspEmail = types.RspEmail{
 		Success: false,
-		Message: "validate code failed",
+		Message: "短信验证码错误",
 	}
 	c.Ctx.Output.JSON(rspEmail, false, false)
 	return
@@ -64,7 +64,7 @@ func (c *MsgController) SendMsgCode() {
 	}
 
 	if !VCodeValidate(codeId, verifyValue) {
-		err = fmt.Errorf("picture validate failed")
+		err = fmt.Errorf("图形验证码错误，请重新验证！")
 		goto errDeal
 	}
 

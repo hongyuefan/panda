@@ -42,11 +42,11 @@ func (c *UserLoginController) VerifyUser() {
 	reqVerify.UserName = c.Ctx.Request.FormValue("userName")
 	reqVerify.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
 
-	mUser.Email = reqVerify.UserName
+	mUser.Mobile = reqVerify.UserName
 
 	orm = models.NewCommon()
 
-	if err = orm.CommonGetOne(&mUser, "Email"); err != nil {
+	if err = orm.CommonGetOne(&mUser, "Mobile"); err != nil {
 		goto errDeal
 	}
 
@@ -71,6 +71,94 @@ errDeal:
 	ErrorHandler(c.Ctx, err)
 	return
 
+}
+
+func (c *UserLoginController) RegistUserByMobile() {
+	var (
+		reqRgt          types.ReqRegist
+		rspRgt          types.RspRegist
+		invitationCode  string
+		mUser           *models.Player
+		orm             *models.Common
+		public, privkey string
+		token           string
+		uid             int64
+		err             error
+	)
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	reqRgt.NickName = c.Ctx.Request.FormValue("nickName")
+	reqRgt.Password = c.Ctx.Request.FormValue("passWord")
+	reqRgt.TimeStamp = c.Ctx.Request.FormValue("timeStamp")
+	reqRgt.UserName = c.Ctx.Request.FormValue("userName")
+	reqRgt.VerifyCode = c.Ctx.Request.FormValue("verifyCode")
+	invitationCode = c.Ctx.Request.FormValue("code")
+
+	if err = ValidMobile(reqRgt.UserName); err != nil {
+		goto errDeal
+	}
+	if err = ValidatePassWord(reqRgt.Password); err != nil {
+		goto errDeal
+	}
+
+	if len(reqRgt.VerifyCode) != Email_Code_Len || !validMobileCode(reqRgt.VerifyCode, getSessionString(c.GetSession(reqRgt.UserName))) {
+		err = errors.New("手机验证码错误")
+		goto errDeal
+	}
+
+	if public, privkey, err = t.Genkey(); err != nil {
+		goto errDeal
+	}
+
+	mUser = &models.Player{
+		Nickname:    reqRgt.NickName,
+		Mobile:      reqRgt.UserName,
+		Password:    reqRgt.Password,
+		Createtime:  time.Now().Unix(),
+		PubPublic:   public,
+		PubPrivkey:  privkey,
+		GamblingNum: types.Gambling_Num_Default,
+	}
+	orm = models.NewCommon()
+
+	if uid, err = orm.CommonInsert(mUser); err != nil {
+		err = fmt.Errorf("用户注册失败，请重试")
+		goto errDeal
+	}
+
+	if token, err = TokenGenerate(uid); err != nil {
+		goto errDeal
+	}
+
+	rspRgt = types.RspRegist{
+		RspBase: types.RspBase{
+			MemberIsExist: 0,
+		},
+		Data: types.User{
+			MemberId:      fmt.Sprintf("%v", uid),
+			NickName:      reqRgt.NickName,
+			UserName:      reqRgt.UserName,
+			UserType:      UserType_Normal,
+			Token:         token,
+			Avatar:        "",
+			Balance:       "0",
+			Freeze:        "0",
+			WalletAddress: "",
+			Mypets:        "",
+		},
+	}
+
+	if invitationCode != "" {
+		models.UpdateInvitationCount(invitationCode)
+	}
+	SuccessHandler(c.Ctx, rspRgt)
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
 }
 
 func (c *UserLoginController) RegistUser() {
@@ -205,6 +293,69 @@ func (c *UserLoginController) ModifyNickName() {
 		Message: "update nickname success",
 	}, false, false)
 
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
+func (c *UserLoginController) UserLoginByMobile() {
+	var (
+		reqLogin       types.ReqLogin
+		rspLogin       types.RspRegist
+		mUser          *models.Player
+		orm            *models.Common
+		token, balance string
+		err            error
+	)
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	reqLogin.UserName = c.Ctx.Request.FormValue("userName")
+	reqLogin.PassWord = c.Ctx.Request.FormValue("passWord")
+
+	mUser = &models.Player{
+		Mobile:   reqLogin.UserName,
+		Password: reqLogin.PassWord,
+	}
+
+	orm = models.NewCommon()
+
+	if err = orm.CommonGetOne(mUser, "Mobile", "PassWord"); err != nil || mUser.Id <= 0 {
+		err = fmt.Errorf("用户名或密码错误！")
+		goto errDeal
+	}
+
+	if mUser.Id > 0 {
+		if token, err = TokenGenerate(mUser.Id); err != nil {
+			goto errDeal
+		}
+
+		if balance, err = t.GetBalance(mUser.PubPublic); err != nil {
+			balance = "0"
+		}
+
+		rspLogin = types.RspRegist{
+			RspBase: types.RspBase{
+				MemberIsExist: User_Exist,
+			},
+			Data: types.User{
+				MemberId:      fmt.Sprintf("%v", mUser.Id),
+				NickName:      mUser.Nickname,
+				UserName:      mUser.Mobile,
+				UserType:      UserType_Normal,
+				Token:         token,
+				Avatar:        mUser.Avatar,
+				Balance:       balance,
+				Freeze:        fmt.Sprintf("%v", mUser.Isdel),
+				WalletAddress: mUser.Pubkey,
+				Mypets:        "",
+			},
+		}
+	}
+	SuccessHandler(c.Ctx, rspLogin)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)
@@ -395,6 +546,66 @@ func (c *UserLoginController) UpdatePassWord() {
 	c.Ctx.Output.JSON(RspPass{
 		Success: true,
 		Message: "update password success",
+	}, false, false)
+
+	return
+errDeal:
+	c.Ctx.Output.JSON(RspPass{
+		Success: false,
+		Message: err.Error(),
+	}, false, false)
+	return
+}
+
+func (c *UserLoginController) UpdatePassWordByMobile() {
+	type RspPass struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+	var (
+		err         error
+		newPassWord string
+		mobile      string
+		verifyCody  string
+		user        models.Player
+		com         *models.Common
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	mobile = c.Ctx.Request.FormValue("userName")
+	newPassWord = c.Ctx.Request.FormValue("newPassword")
+	verifyCody = c.Ctx.Request.FormValue("verifyCode")
+
+	if err = ValidatePassWord(newPassWord); err != nil {
+		goto errDeal
+	}
+
+	if !validMobileCode(verifyCody, getSessionString(c.GetSession(mobile))) {
+		err = errors.New("短信验证码失败")
+		goto errDeal
+	}
+
+	user.Mobile = mobile
+
+	com = models.NewCommon()
+
+	if err = com.CommonGetOne(&user, "Mobile"); err != nil {
+		err = fmt.Errorf("用户不存在")
+		goto errDeal
+	}
+
+	user.Password = newPassWord
+
+	if _, err = com.CommonUpdateById(&user, "password"); err != nil {
+		err = fmt.Errorf("密码更新失败，请重试！")
+		goto errDeal
+	}
+
+	c.Ctx.Output.JSON(RspPass{
+		Success: true,
+		Message: "密码修改成功",
 	}, false, false)
 
 	return

@@ -11,10 +11,10 @@ const (
 
 func ValidMobile(mobile string) (err error) {
 	if len(mobile) != Len_Mobile {
-		return errors.New("mobile length not enough")
+		return errors.New("手机长度不足")
 	}
 	if !strings.HasPrefix(mobile, "1") {
-		return errors.New("mobile form not right")
+		return errors.New("手机格式不正确")
 	}
 	return
 }
@@ -33,7 +33,7 @@ func ValidateEmail(userName string) (err error) {
 
 func ValidatePassWord(passWord string) (err error) {
 	if len(passWord) < 6 {
-		err = errors.New("password length not enough")
+		err = errors.New("密码长度至少6位")
 		return err
 	}
 	return nil

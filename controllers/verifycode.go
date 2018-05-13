@@ -22,7 +22,7 @@ func (c *VerifyController) GenerateCode() {
 	var (
 		rspCode types.RspGenCode
 	)
-	rspCode.CodeId, rspCode.PngBase64 = VCodeGenerate(60, 240, Cap_Metic_Mod)
+	rspCode.CodeId, rspCode.PngBase64 = VCodeGenerate(60, 240, Cap_Num_Mod)
 
 	SuccessHandler(c.Ctx, rspCode)
 
