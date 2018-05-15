@@ -109,6 +109,20 @@ func (c *UserLoginController) RegistUserByMobile() {
 		goto errDeal
 	}
 
+	mUser = &models.Player{
+		Mobile: reqRgt.UserName,
+	}
+
+	orm = models.NewCommon()
+
+	if err = orm.CommonGetOne(&mUser, "Mobile"); err != nil {
+		goto errDeal
+	}
+	if mUser.Id != 0 {
+		err = errors.New("手机号已经存在，请登录！")
+		goto errDeal
+	}
+
 	if public, privkey, err = t.Genkey(); err != nil {
 		goto errDeal
 	}
@@ -122,10 +136,9 @@ func (c *UserLoginController) RegistUserByMobile() {
 		PubPrivkey:  privkey,
 		GamblingNum: types.Gambling_Num_Default,
 	}
-	orm = models.NewCommon()
 
 	if uid, err = orm.CommonInsert(mUser); err != nil {
-		err = fmt.Errorf("用户注册失败，请重试")
+		err = fmt.Errorf("用户注册失败，请重试!")
 		goto errDeal
 	}
 
