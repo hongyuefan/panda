@@ -115,7 +115,7 @@ func (c *UserLoginController) RegistUserByMobile() {
 
 	orm = models.NewCommon()
 
-	if err = orm.CommonGetOne(&mUser, "Mobile"); err != nil {
+	if err = orm.CommonGetOne(mUser, "Mobile"); err != nil {
 		goto errDeal
 	}
 	if mUser.Id != 0 {
