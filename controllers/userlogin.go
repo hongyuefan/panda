@@ -80,6 +80,7 @@ func (c *UserLoginController) RegistUserByMobile() {
 		invitationCode  string
 		mUser           *models.Player
 		orm             *models.Common
+		conf            models.Config
 		public, privkey string
 		token           string
 		uid             int64
@@ -127,6 +128,8 @@ func (c *UserLoginController) RegistUserByMobile() {
 		goto errDeal
 	}
 
+	conf = GetConfigData()
+
 	mUser = &models.Player{
 		Nickname:    reqRgt.NickName,
 		Mobile:      reqRgt.UserName,
@@ -135,10 +138,11 @@ func (c *UserLoginController) RegistUserByMobile() {
 		PubPublic:   public,
 		PubPrivkey:  privkey,
 		GamblingNum: types.Gambling_Num_Default,
+		Avatar:      conf.HostUrl + types.Pic_File_Path + "/Default.jpg",
 	}
 
 	if uid, err = orm.CommonInsert(mUser); err != nil {
-		err = fmt.Errorf("用户注册失败，请重试!")
+		err = fmt.Errorf("用户注册失败，昵称 %v 已存在！", mUser.Nickname)
 		goto errDeal
 	}
 
@@ -156,7 +160,7 @@ func (c *UserLoginController) RegistUserByMobile() {
 			UserName:      reqRgt.UserName,
 			UserType:      UserType_Normal,
 			Token:         token,
-			Avatar:        "",
+			Avatar:        mUser.Avatar,
 			Balance:       "0",
 			Freeze:        "0",
 			WalletAddress: "",
@@ -263,6 +267,31 @@ func (c *UserLoginController) RegistUser() {
 		models.UpdateInvitationCount(invitationCode)
 	}
 	SuccessHandler(c.Ctx, rspRgt)
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
+func (c *UserLoginController) GetNewToken() {
+
+	var (
+		uId   int64
+		err   error
+		token string
+	)
+
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+
+	if uId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+	if token, err = TokenGenerate(uId); err != nil {
+		goto errDeal
+	}
+	SuccessHandler(c.Ctx, token)
 	return
 errDeal:
 	ErrorHandler(c.Ctx, err)

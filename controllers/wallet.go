@@ -19,23 +19,33 @@ type RspWallet struct {
 
 func (w *WalletController) SetWalletAddress() {
 	var (
-		err    error
-		mUser  models.Player
-		orm    *models.Common
-		wallet string
+		err                 error
+		mUser               *models.Player
+		orm                 *models.Common
+		uId                 int64
+		wallet, mobile_code string
 	)
 
-	if mUser.Id, err = ParseAndValidToken(w.Ctx.Input.Header("Authorization")); err != nil {
+	if uId, err = ParseAndValidToken(w.Ctx.Input.Header("Authorization")); err != nil {
 		goto errDeal
 	}
 	if err = w.Ctx.Request.ParseForm(); err != nil {
 		goto errDeal
 	}
 	wallet = w.Ctx.Request.FormValue("wallet")
+	mobile_code = w.GetString("verifyCode")
 
 	wallet = strings.TrimPrefix(strings.ToUpper(wallet), "0X")
 
 	if err = t.ValidatePublicKey(wallet); err != nil {
+		goto errDeal
+	}
+
+	if mUser, err = models.GetPlayerById(uId); err != nil {
+		goto errDeal
+	}
+
+	if validMobileCode(mobile_code, getSessionString(w.GetSession(mUser.Mobile))) {
 		goto errDeal
 	}
 

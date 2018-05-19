@@ -18,26 +18,32 @@ func init() {
 	beego.Router("/", &controllers.ViewController{}, "get:Index")
 
 	beego.Router("/v1/tsxm/verifycode", &controllers.UserLoginController{}, "post:VerifyUser")
-	beego.Router("/v1/tsxm/regist", &controllers.UserLoginController{}, "post:RegistUser")
-	beego.Router("/v1/tsxm/login", &controllers.UserLoginController{}, "post:UserLogin")
 
-	beego.Router("/v1/tsxm/mobile/regist", &controllers.UserLoginController{}, "post:RegistUserByMobile")
-	beego.Router("/v1/tsxm/mobile/login", &controllers.UserLoginController{}, "post:UserLoginByMobile")
-	beego.Router("/v1/tsxm/mobile/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWordByMobile")
+	beego.Router("/v1/tsxm/email/regist", &controllers.UserLoginController{}, "post:RegistUser")
+	beego.Router("/v1/tsxm/email/login", &controllers.UserLoginController{}, "post:UserLogin")
+	beego.Router("/v1/tsxm/email/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWord")
+
+	beego.Router("/v1/tsxm/token", &controllers.UserLoginController{}, "GET:GetNewToken")
+	beego.Router("/v1/tsxm/regist", &controllers.UserLoginController{}, "post:RegistUserByMobile")
+	beego.Router("/v1/tsxm/login", &controllers.UserLoginController{}, "post:UserLoginByMobile")
+	beego.Router("/v1/tsxm/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWordByMobile")
 
 	beego.Router("/v1/tsxm/avatarupload", &controllers.UserLoginController{}, "post:UploadPic")
 	beego.Router("/v1/tsxm/genverifycode", &controllers.VerifyController{}, "get:GenerateCode")
 	beego.Router("/v1/tsxm/validateCode", &controllers.VerifyController{}, "get:ValidateCode")
+
 	beego.Router("/v1/tsxm/sendemail", &controllers.EmailController{}, "get:SendEmailCode")
 	beego.Router("/v1/tsxm/validemail", &controllers.EmailController{}, "get:ValidateEmailCode")
+
+	beego.Router("/v1/tsxm/sendsms", &controllers.MsgController{}, "get:SendMsgToken")
 	beego.Router("/v1/tsxm/sendmsg", &controllers.MsgController{}, "get:SendMsgCode")
 	beego.Router("/v1/tsxm/validemsg", &controllers.MsgController{}, "get:ValidateMsgCode")
+
 	beego.Router("/v1/tsxm/agreement", &controllers.AgreeContoller{}, "get:GetAgreement")
 	beego.Router("/v1/tsxm/balance", &controllers.BalanceConroller{}, "get:GetBalance")
 	beego.Router("/v1/tsxm/recharge", &controllers.QRCodeController{}, "get:GenCode")
 	beego.Router("/v1/tsxm/modifyname", &controllers.UserLoginController{}, "post:ModifyNickName")
 	beego.Router("/v1/tsxm/transaction", &controllers.TransQContoller{}, "get:GetTransQ")
-	beego.Router("/v1/tsxm/forgetpassword", &controllers.UserLoginController{}, "post:UpdatePassWord")
 
 	beego.Router("/v1/tsxm/loadconfig", &controllers.ConfigDataController{}, "get:LoadConfig")
 	beego.Router("/v1/tsxm/capture", &controllers.PandaCatchController{}, "get:HandlerPandaCatch")

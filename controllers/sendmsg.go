@@ -42,6 +42,51 @@ errDeal:
 	return
 }
 
+func (c *MsgController) SendMsgToken() {
+	var (
+		mUser    *models.Player
+		err      error
+		uId      int64
+		code     string
+		params   []string
+		conf     models.Config
+		rspEmail types.RspEmail
+	)
+	if err = c.Ctx.Request.ParseForm(); err != nil {
+		goto errDeal
+	}
+	if uId, err = ParseAndValidToken(c.Ctx.Input.Header("Authorization")); err != nil {
+		goto errDeal
+	}
+	if mUser, err = models.GetPlayerById(uId); err != nil {
+		goto errDeal
+	}
+
+	code = arithmetic.GetRandLimit(Email_Code_Len)
+
+	params = []string{code}
+
+	conf = GetConfigData()
+
+	if err = sendmsg.SendMsg(conf.AppId, conf.AppKey, "86", mUser.Mobile, params, conf.TplId); err != nil {
+		goto errDeal
+	}
+
+	c.SetSession(mUser.Mobile, code)
+
+	rspEmail = types.RspEmail{
+		Success: true,
+		Message: "发送成功",
+	}
+
+	c.Ctx.Output.JSON(rspEmail, false, false)
+
+	return
+errDeal:
+	ErrorHandler(c.Ctx, err)
+	return
+}
+
 func (c *MsgController) SendMsgCode() {
 
 	var (
