@@ -61,7 +61,7 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 		surplus = conf.InvitationLimit - count
 	}
 
-	invitationUrl = conf.HostUrl + "/v1/tsxm/regist?code=" + code
+	invitationUrl = conf.HostUrl + "/regist?code=" + code
 
 	if img, err = GenQRCode(invitationUrl, 300, 300); err != nil {
 		goto errDeal
