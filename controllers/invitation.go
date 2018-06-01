@@ -20,6 +20,7 @@ type InvitationController struct {
 type RspInvitationCode struct {
 	InvitationUrl string `json:"invitation_url"`
 	Surplus       int    `json:"surplus"`
+	Total         int    `json:"total"`
 	IsReward      int    `json:"isReward"`
 	Image         string `json:"image"`
 }
@@ -34,6 +35,8 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 		flag                     int
 		rspInvitationCode        RspInvitationCode
 	)
+
+	common := "太上熊猫是基于区块链的宠物养成小游戏，她具有唯一性，不可篡改，并具有收藏性价值。注册并邀请好友送太上熊猫哦！"
 
 	conf := GetConfigData()
 
@@ -67,8 +70,9 @@ func (c *InvitationController) HandlerGenerateInvitationCode() {
 		goto errDeal
 	}
 	rspInvitationCode = RspInvitationCode{
-		InvitationUrl: invitationUrl,
+		InvitationUrl: invitationUrl + common,
 		Surplus:       surplus,
+		Total:         conf.InvitationLimit,
 		IsReward:      flag,
 		Image:         img,
 	}
