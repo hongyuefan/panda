@@ -11,8 +11,7 @@ type AgreeContoller struct {
 }
 
 type Content struct {
-	Text     string       `json:"text"`
-	Subtages []SubContent `json:"subtags"`
+	Text string `json:"text"`
 }
 
 type SubContent struct {
@@ -53,15 +52,7 @@ func (a *AgreeContoller) GetAgreement() {
 		subContents = append(subContents, sub)
 	}
 
-	switch types {
-	case "help":
-		content.Text = "帮助中心"
-	case "luckdraw":
-		content.Text = "抽奖协议"
-	case "regist":
-		content.Text = "注册协议"
-	}
-	content.Subtages = subContents
+	content.Text = sub.Standard
 
 	SuccessHandler(a.Ctx, content)
 

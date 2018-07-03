@@ -70,15 +70,6 @@ func TestCatchCold(t *testing.T) {
 	return
 }
 
-func TestBenefit(t *testing.T) {
-	zl, err := Benefit("1.2", "1.4", 50, 0.5, 1)
-	if err != nil {
-		panic(err)
-	}
-	t.Log(zl)
-	return
-}
-
 func TestParseSecond(t *testing.T) {
 	h, m, s := ParseSecond(3667)
 
@@ -93,4 +84,8 @@ func TestParseFloat(t *testing.T) {
 
 func TestGencode(t *testing.T) {
 	t.Log(GenCode(6))
+}
+
+func TestSplitTx_Trim_N_S(t *testing.T) {
+	t.Log(SplitTx_Trim_N_S("0x53920a848eda64ff9c1bf56c496d34e2598e0b025423764bf96e10e286892b28"))
 }

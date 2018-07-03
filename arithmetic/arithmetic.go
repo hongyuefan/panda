@@ -55,6 +55,9 @@ func SplitTx_Trim_N(tx string, n int) (b int, err error) {
 
 }
 
+func SplitTx_Trim_N_S(tx string) string {
+	return tx[len(tx)-6:]
+}
 func HexToI(a string) (b int, err error) {
 
 	var ok bool
