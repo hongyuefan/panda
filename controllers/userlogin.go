@@ -124,7 +124,7 @@ func (c *UserLoginController) RegistUserByMobile() {
 		goto errDeal
 	}
 
-	if public, privkey, err = t.Genkey(); err != nil {
+	if public, privkey, err = t.Genkey(mUser.Mobile); err != nil {
 		goto errDeal
 	}
 
@@ -214,7 +214,7 @@ func (c *UserLoginController) RegistUser() {
 		goto errDeal
 	}
 
-	if public, privkey, err = t.Genkey(); err != nil {
+	if public, privkey, err = t.Genkey(reqRgt.UserName); err != nil {
 		goto errDeal
 	}
 

@@ -50,7 +50,7 @@ func NewOpChain(netWork string) *OpChain {
 	return &OpChain{}
 }
 
-func (o *OpChain) GenKeyPair() (pub, priv string, err error) {
+func (o *OpChain) GenKeyPair(lable string) (pub, priv string, err error) {
 
 	pair, err := keypair.Random()
 	if err != nil {
@@ -93,7 +93,7 @@ func (o *OpChain) GetBalance(address string) (balance string, err error) {
 	return
 }
 
-func (o *OpChain) DoTransaction(sPrivkey, dPublic, amount string) (txhash string, err error) {
+func (o *OpChain) DoTransaction(lable, sPrivkey, dPublic, amount string) (txhash string, err error) {
 	tx, err := b.Transaction(
 		b.Network{o.netWork},
 		b.SourceAccount{sPrivkey},

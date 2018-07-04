@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root:350999@tcp(47.92.67.93:3306)/panda")
+	orm.RegisterDataBase("default", "mysql", "root:350999@tcp(127.0.0.1:3306)/panda")
 }
 
 func main() {

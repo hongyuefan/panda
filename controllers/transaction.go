@@ -45,7 +45,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 			err = types.Error_Trans_AmountOver
 			return
 		}
-		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, mPlay.Pubkey, amount); err != nil {
+		if txhash, err = trans.DoTransaction(mPlay.Mobile, mPlay.PubPrivkey, mPlay.Pubkey, amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
@@ -93,7 +93,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 			err = types.Error_Trans_AmountOver
 			return
 		}
-		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Catch].Amount); err != nil {
+		if txhash, err = trans.DoTransaction(mPlay.Mobile, mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Catch].Amount); err != nil {
 			return
 		}
 
@@ -120,7 +120,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 		if result >= 0 {
 			return "", types.Error_Train_AmountOver
 		}
-		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, amount); err != nil {
+		if txhash, err = trans.DoTransaction(mPlay.Mobile, mPlay.PubPrivkey, conf.OwnerPub, amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
@@ -167,7 +167,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 			return
 		}
 
-		if txhash, err = trans.DoTransaction(mBuyer.PubPrivkey, mSeller.PubPublic, mOffer.Price); err != nil {
+		if txhash, err = trans.DoTransaction(mBuyer.Mobile, mBuyer.PubPrivkey, mSeller.PubPublic, mOffer.Price); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
@@ -193,7 +193,7 @@ func (t *TransactionContoller) Transactions(ntype int64, uid, pid, offerId int64
 			err = types.Error_Trans_AmountOver
 			return
 		}
-		if txhash, err = trans.DoTransaction(mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Gambling].Amount); err != nil {
+		if txhash, err = trans.DoTransaction(mPlay.Mobile, mPlay.PubPrivkey, conf.OwnerPub, conf.GetMapType()[types.Trans_Type_Gambling].Amount); err != nil {
 			return
 		}
 		//TODO:建立消息组件，保证数据落地存储，防止数据库与区块链数据不一致
@@ -286,7 +286,7 @@ func (t *TransactionContoller) Bonus(conf models.Config) (err error) {
 
 			for {
 
-				if txhash, err = trans.DoTransaction(conf.OwnerPrv, player.PubPublic, sBunos); err == nil {
+				if txhash, err = trans.DoTransaction("panda", conf.OwnerPrv, player.PubPublic, sBunos); err == nil {
 					break
 				}
 				count++

@@ -2,7 +2,8 @@ package transaction
 
 import (
 	"panda/chain"
-	"panda/chain/stellar"
+	//"panda/chain/stellar"
+	"panda/chain/ont"
 
 	"github.com/astaxie/beego"
 )
@@ -16,15 +17,16 @@ var trans chain.ChainOp
 
 //初始化实例，根据需求定制实例对象
 func init() {
-	trans = stellar.NewOpChain(beego.BConfig.RunMode)
+	//trans = stellar.NewOpChain(beego.BConfig.RunMode)
+	trans, _ = ont.NewOpChain("./wallet.dat", beego.AppConfig.String("chain_rpc"))
 }
 
-func Genkey() (pub, priv string, err error) {
-	return trans.GenKeyPair()
+func Genkey(lable string) (pub, priv string, err error) {
+	return trans.GenKeyPair(lable)
 }
 
-func DoTransaction(sPrivkey, dPublic, amount string) (txhash string, err error) {
-	return trans.DoTransaction(sPrivkey, dPublic, amount)
+func DoTransaction(lable, sPrivkey, dPublic, amount string) (txhash string, err error) {
+	return trans.DoTransaction(lable, sPrivkey, dPublic, amount)
 }
 
 func QueryTransaction(txhash string) (int, error) {

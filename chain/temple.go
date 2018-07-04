@@ -1,9 +1,9 @@
 package chain
 
 type ChainOp interface {
-	DoTransaction(string, string, string) (string, error)
+	DoTransaction(string, string, string, string) (string, error)
 	QueryTransaction(string) (int, error)
-	GenKeyPair() (string, string, error)
+	GenKeyPair(string) (string, string, error)
 	GetBalance(string) (string, error)
 	ValidatePublicKey(string) error
 }
